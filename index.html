@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wirepine Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav">
+      <span class="nav-logo">WL</span>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
+    </nav>
+    <h1 class="hero-title">Wirepine Lab</h1>
+    <p class="hero-subtitle">An AI-native experimental studio</p>
+  </header>
+
+  <main>
+    <section class="manifesto">
+      <div class="manifesto-content">
+        <h2>Manifesto</h2>
+        <p>We build at the intersection of artificial intelligence and human intent. Where WordPress offered templates, we offer transformation. Where platforms promised ease, we pursue essence.</p>
+        <p>Our work lives in the space between systems thinking and design intuition—crafting experiments that question, artifacts that provoke, and tools that evolve alongside the minds that use them.</p>
+        <p class="manifesto-tagline">Experiments. Systems. AI. Design.</p>
+      </div>
+    </section>
+
+    <section class="experiments">
+      <h2>Experiments</h2>
+      <div class="experiments-grid">
+        <article class="experiment-card">
+          <h3>Semantic Drift</h3>
+          <p>Exploring how meaning shifts when AI interprets human language across contexts.</p>
+        </article>
+        <article class="experiment-card">
+          <h3>Pattern Emergence</h3>
+          <p>Visualizing the latent structures hidden within generative model outputs.</p>
+        </article>
+        <article class="experiment-card">
+          <h3>Interface Zero</h3>
+          <p>Designing interactions that disappear—where the tool becomes invisible.</p>
+        </article>
+        <article class="experiment-card">
+          <h3>Synthetic Memory</h3>
+          <p>Building systems that remember differently than we do.</p>
+        </article>
+        <article class="experiment-card">
+          <h3>Constraint Gardens</h3>
+          <p>Growing creativity within deliberate limitations and structured chaos.</p>
+        </article>
+        <article class="experiment-card">
+          <h3>Echo Protocol</h3>
+          <p>Feedback loops between human intention and machine interpretation.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="artifact">
+      <h2>Featured Artifact</h2>
+      <figure class="artifact-figure">
+        <div class="artifact-image" aria-label="Featured artifact placeholder">
+          <span>Artifact 001</span>
+        </div>
+        <figcaption>
+          <strong>Topology of Thought</strong>
+          <span>A generative study on the shape of reasoning—mapping how ideas connect, diverge, and reconverge through iterative AI collaboration.</span>
+        </figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="https://wirepine.com">wirepine.com</a>
+        <a href="https://newsletter.wirepine.com">newsletter</a>
+      </div>
+      <p class="footer-copyright">&copy; 2025 Wirepine Lab. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      root.setAttribute('data-theme', savedTheme);
+      toggle.textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+    }
+
+    toggle.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+
+      if (next === 'light') {
+        root.removeAttribute('data-theme');
+      } else {
+        root.setAttribute('data-theme', 'dark');
+      }
+
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? 'Light' : 'Dark';
+    });
+  </script>
+</body>
+</html>
