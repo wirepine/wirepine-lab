@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="lightningGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F4FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0C4E8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="#1A4D5C" opacity="0.9"/>
+  <path d="M17 20c0-4 3-6 7-6s7 2 7 6" fill="none" stroke="url(#lightningGrad)" stroke-width="1.5"/>
+  <path d="M17 20v8c0 2 1.5 4 7 4s7-2 7-4v-8" fill="none" stroke="url(#lightningGrad)" stroke-width="1.5"/>
+  <circle cx="20" cy="22" r="1.5" fill="url(#lightningGrad)"/>
+  <circle cx="24" cy="20" r="1.5" fill="url(#lightningGrad)"/>
+  <circle cx="28" cy="22" r="1.5" fill="url(#lightningGrad)"/>
+  <path d="M20 23.5v3M24 21.5v4M28 23.5v3" stroke="url(#lightningGrad)" stroke-width="1"/>
+</svg>

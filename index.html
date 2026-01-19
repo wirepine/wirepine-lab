@@ -8,12 +8,15 @@
 </head>
 <body>
   <header class="hero">
+    <div class="hero-bg"></div>
     <nav class="nav">
-      <span class="nav-logo">WL</span>
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
+      <img src="2-band flat.png" alt="Wirepine" class="nav-logo">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Light</button>
     </nav>
-    <h1 class="hero-title">Wirepine Lab</h1>
-    <p class="hero-subtitle">An AI-native experimental studio</p>
+    <div class="hero-content">
+      <h1 class="hero-title"><span class="wire">Wire</span>pine Lab</h1>
+      <p class="hero-subtitle">An AI-native experimental studio</p>
+    </div>
   </header>
 
   <main>
@@ -30,26 +33,32 @@
       <h2>Experiments</h2>
       <div class="experiments-grid">
         <article class="experiment-card">
+          <img src="icon library/semantic-drift.svg" alt="" class="experiment-icon">
           <h3>Semantic Drift</h3>
           <p>Exploring how meaning shifts when AI interprets human language across contexts.</p>
         </article>
         <article class="experiment-card">
+          <img src="icon library/pattern-emergence.svg" alt="" class="experiment-icon">
           <h3>Pattern Emergence</h3>
           <p>Visualizing the latent structures hidden within generative model outputs.</p>
         </article>
         <article class="experiment-card">
+          <img src="icon library/interface-zero.svg" alt="" class="experiment-icon">
           <h3>Interface Zero</h3>
           <p>Designing interactions that disappear—where the tool becomes invisible.</p>
         </article>
         <article class="experiment-card">
+          <img src="icon library/synthetic-memory.svg" alt="" class="experiment-icon">
           <h3>Synthetic Memory</h3>
           <p>Building systems that remember differently than we do.</p>
         </article>
         <article class="experiment-card">
+          <img src="icon library/constraint-gardens.svg" alt="" class="experiment-icon">
           <h3>Constraint Gardens</h3>
           <p>Growing creativity within deliberate limitations and structured chaos.</p>
         </article>
         <article class="experiment-card">
+          <img src="icon library/echo-protocol.svg" alt="" class="experiment-icon">
           <h3>Echo Protocol</h3>
           <p>Feedback loops between human intention and machine interpretation.</p>
         </article>
@@ -68,6 +77,14 @@
         </figcaption>
       </figure>
     </section>
+
+    <section class="newsletter">
+      <h2>From the Newsletter</h2>
+      <div class="newsletter-grid" id="newsletter-feed">
+        <div class="newsletter-loading">Loading posts...</div>
+      </div>
+      <a href="https://newsletter.wirepine.com" class="newsletter-cta">Subscribe to TechTales</a>
+    </section>
   </main>
 
   <footer class="footer">
@@ -81,28 +98,77 @@
   </footer>
 
   <script>
+    // Theme toggle
     const toggle = document.getElementById('theme-toggle');
     const root = document.documentElement;
 
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      root.setAttribute('data-theme', savedTheme);
-      toggle.textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+    if (savedTheme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      toggle.textContent = 'Dark';
     }
 
     toggle.addEventListener('click', () => {
-      const current = root.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
+      const isLight = root.getAttribute('data-theme') === 'light';
 
-      if (next === 'light') {
+      if (isLight) {
         root.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = 'Light';
       } else {
-        root.setAttribute('data-theme', 'dark');
+        root.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        toggle.textContent = 'Dark';
       }
-
-      localStorage.setItem('theme', next);
-      toggle.textContent = next === 'dark' ? 'Light' : 'Dark';
     });
+
+    // Newsletter RSS feed
+    async function loadNewsletter() {
+      const feed = document.getElementById('newsletter-feed');
+      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+      const RSS_URL = 'https://newsletter.wirepine.com/feed';
+
+      try {
+        const response = await fetch(CORS_PROXY + encodeURIComponent(RSS_URL));
+        const text = await response.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, 'text/xml');
+        const items = xml.querySelectorAll('item');
+
+        const posts = Array.from(items).slice(0, 4).map(item => {
+          const title = item.querySelector('title')?.textContent || '';
+          const link = item.querySelector('link')?.textContent || '';
+          const description = item.querySelector('description')?.textContent || '';
+          const pubDate = item.querySelector('pubDate')?.textContent || '';
+          const enclosure = item.querySelector('enclosure');
+          const image = enclosure?.getAttribute('url') || '';
+
+          const date = new Date(pubDate).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          });
+
+          return { title, link, description, date, image };
+        });
+
+        feed.innerHTML = posts.map(post => `
+          <a href="${post.link}" class="newsletter-card" target="_blank" rel="noopener">
+            ${post.image ? `<img src="${post.image}" alt="" class="newsletter-image">` : ''}
+            <div class="newsletter-card-content">
+              <time class="newsletter-date">${post.date}</time>
+              <h3 class="newsletter-title">${post.title}</h3>
+              <p class="newsletter-excerpt">${post.description}</p>
+            </div>
+          </a>
+        `).join('');
+
+      } catch (error) {
+        feed.innerHTML = '<p class="newsletter-error">Unable to load posts. <a href="https://newsletter.wirepine.com">Visit the newsletter</a></p>';
+      }
+    }
+
+    loadNewsletter();
   </script>
 </body>
 </html>
