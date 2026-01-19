@@ -1,0 +1,16 @@
+# Windows Zone.Identifier metadata files (WSL)
+*:Zone.Identifier
+
+# Screenshots
+Screenshot*.png
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
