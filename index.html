@@ -118,11 +118,12 @@
 │                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   MANIFESTO                                                     │
-│   ─────────                                                     │
-│   We build at the intersection of artificial intelligence       │
-│   and human intent. Where WordPress offered templates,          │
-│   we offer transformation.                                      │
+│   IMAGINE                                                       │
+│   ───────                                                       │
+│   Wirepine Lab channels the energy of the early web — when      │
+│   it felt like the internet connected us, information flowed    │
+│   freely, and we weren't buried under feeds and ads. A Golden   │
+│   Age, when it seemed like everything was possible.             │
 │                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
@@ -134,7 +135,7 @@
 │                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   > Press [A] to play ASTEROIDS                                 │
+│   <span class="desktop-only">> Press [A] to play ASTEROIDS                                 </span><span class="mobile-only">> View on desktop to play ASTEROIDS                           </span>│
 │   > Press [ESC] to return to 2025                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -357,7 +358,7 @@
         }
       }
 
-      if ((e.key === 'a' || e.key === 'A') && !terminalContent.hidden) {
+      if ((e.key === 'a' || e.key === 'A') && !terminalContent.hidden && window.innerWidth > 768) {
         showAsteroids();
       }
     });

@@ -802,3 +802,17 @@ section h2::after {
     font-size: 0.75rem;
   }
 }
+
+/* Mobile/Desktop visibility utilities */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-only {
+    display: inline;
+  }
+}
