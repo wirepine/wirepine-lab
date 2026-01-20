@@ -298,6 +298,134 @@
     // ==========================================
     // ASTEROIDS GAME
     // ==========================================
+
+    // Sound effects using Web Audio API
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playPew() {
+      const ctx = initAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1);
+
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    }
+
+    function playThrust() {
+      const ctx = initAudio();
+      const bufferSize = ctx.sampleRate * 0.05;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.3;
+      }
+
+      const noise = ctx.createBufferSource();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+
+      noise.buffer = buffer;
+      filter.type = 'lowpass';
+      filter.frequency.value = 200;
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+
+      noise.start(ctx.currentTime);
+    }
+
+    function playBoom() {
+      const ctx = initAudio();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(100, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.3);
+
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    }
+
+    function playShipExplosion() {
+      const ctx = initAudio();
+
+      // Layer 1: Deep rumble
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(80, ctx.currentTime);
+      osc1.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.6);
+      gain1.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+      osc1.start(ctx.currentTime);
+      osc1.stop(ctx.currentTime + 0.6);
+
+      // Layer 2: Mid crunch
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(200, ctx.currentTime);
+      osc2.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.4);
+      gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      osc2.start(ctx.currentTime);
+      osc2.stop(ctx.currentTime + 0.4);
+
+      // Layer 3: Noise burst
+      const bufferSize = ctx.sampleRate * 0.5;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1);
+      }
+      const noise = ctx.createBufferSource();
+      const noiseGain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      noise.buffer = buffer;
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1000, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.5);
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noiseGain.gain.setValueAtTime(0.25, ctx.currentTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      noise.start(ctx.currentTime);
+    }
+
     function startAsteroids() {
       const canvas = asteroidsCanvas;
       const ctx = canvas.getContext('2d');
@@ -377,9 +505,12 @@
           vy: Math.sin(ship.angle) * 8,
           life: 60
         });
+        playPew();
       }
 
       let canShoot = true;
+      let canThrust = true;
+      let invulnerable = false;
 
       function update() {
         // Rotation
@@ -391,6 +522,11 @@
           ship.thrust.x += Math.cos(ship.angle) * 0.15;
           ship.thrust.y += Math.sin(ship.angle) * 0.15;
           ship.thrusting = true;
+          if (canThrust) {
+            playThrust();
+            canThrust = false;
+            setTimeout(() => canThrust = true, 80);
+          }
         } else {
           ship.thrusting = false;
         }
@@ -446,6 +582,7 @@
               ship.bullets.splice(bi, 1);
               score += Math.floor(100 / a.radius * 10);
               scoreDisplay.textContent = score;
+              playBoom();
 
               // Split asteroid
               if (a.radius > 20) {
@@ -458,19 +595,26 @@
         });
 
         // Collision: ship vs asteroids
-        asteroids.forEach(a => {
-          if (Math.hypot(ship.x - a.x, ship.y - a.y) < ship.radius + a.radius - 10) {
-            lives--;
-            livesDisplay.textContent = lives;
-            // Reset ship
-            ship.x = canvas.width / 2;
-            ship.y = canvas.height / 2;
-            ship.thrust = { x: 0, y: 0 };
-            if (lives <= 0) {
-              gameOver();
+        if (!invulnerable) {
+          for (let i = 0; i < asteroids.length; i++) {
+            const a = asteroids[i];
+            if (Math.hypot(ship.x - a.x, ship.y - a.y) < ship.radius + a.radius - 10) {
+              lives--;
+              livesDisplay.textContent = lives;
+              playShipExplosion();
+              // Reset ship with invulnerability
+              ship.x = canvas.width / 2;
+              ship.y = canvas.height / 2;
+              ship.thrust = { x: 0, y: 0 };
+              invulnerable = true;
+              setTimeout(() => invulnerable = false, 2000);
+              if (lives <= 0) {
+                gameOver();
+              }
+              break; // Only one collision per frame
             }
           }
-        });
+        }
 
         // Level complete
         if (asteroids.length === 0) {
@@ -487,29 +631,31 @@
         ctx.shadowColor = '#0f0';
         ctx.shadowBlur = 10;
 
-        // Draw ship
-        ctx.save();
-        ctx.translate(ship.x, ship.y);
-        ctx.rotate(ship.angle);
-        ctx.beginPath();
-        ctx.moveTo(ship.radius, 0);
-        ctx.lineTo(-ship.radius * 0.7, -ship.radius * 0.6);
-        ctx.lineTo(-ship.radius * 0.4, 0);
-        ctx.lineTo(-ship.radius * 0.7, ship.radius * 0.6);
-        ctx.closePath();
-        ctx.stroke();
-
-        // Thrust flame
-        if (ship.thrusting) {
+        // Draw ship (blink when invulnerable)
+        if (!invulnerable || Math.floor(Date.now() / 100) % 2) {
+          ctx.save();
+          ctx.translate(ship.x, ship.y);
+          ctx.rotate(ship.angle);
           ctx.beginPath();
-          ctx.moveTo(-ship.radius * 0.4, 0);
-          ctx.lineTo(-ship.radius * 1.2, -ship.radius * 0.2);
-          ctx.lineTo(-ship.radius * 1.5, 0);
-          ctx.lineTo(-ship.radius * 1.2, ship.radius * 0.2);
+          ctx.moveTo(ship.radius, 0);
+          ctx.lineTo(-ship.radius * 0.7, -ship.radius * 0.6);
+          ctx.lineTo(-ship.radius * 0.4, 0);
+          ctx.lineTo(-ship.radius * 0.7, ship.radius * 0.6);
           ctx.closePath();
           ctx.stroke();
+
+          // Thrust flame
+          if (ship.thrusting) {
+            ctx.beginPath();
+            ctx.moveTo(-ship.radius * 0.4, 0);
+            ctx.lineTo(-ship.radius * 1.2, -ship.radius * 0.2);
+            ctx.lineTo(-ship.radius * 1.5, 0);
+            ctx.lineTo(-ship.radius * 1.2, ship.radius * 0.2);
+            ctx.closePath();
+            ctx.stroke();
+          }
+          ctx.restore();
         }
-        ctx.restore();
 
         // Draw bullets
         ship.bullets.forEach(b => {
