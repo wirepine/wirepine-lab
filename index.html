@@ -10,8 +10,8 @@
   <header class="hero">
     <div class="hero-bg"></div>
     <nav class="nav">
-      <img src="2-band flat.png" alt="Wirepine" class="nav-logo">
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Light</button>
+      <img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Dark</button>
     </nav>
     <div class="hero-content">
       <h1 class="hero-title"><span class="wire">Wire</span>pine Lab</h1>
@@ -22,10 +22,11 @@
   <main>
     <section class="manifesto">
       <div class="manifesto-content">
-        <h2>Manifesto</h2>
-        <p>We build at the intersection of artificial intelligence and human intent. Where WordPress offered templates, we offer transformation. Where platforms promised ease, we pursue essence.</p>
-        <p>Our work lives in the space between systems thinking and design intuition—crafting experiments that question, artifacts that provoke, and tools that evolve alongside the minds that use them.</p>
-        <p class="manifesto-tagline">Experiments. Systems. AI. Design.</p>
+        <h2>Imagine</h2>
+        <p><span class="drop-cap">W</span>irepine Lab channels the energy of the early web — when it felt like the internet connected us, information flowed freely, and we weren't buried under feeds and ads. A Golden Age, when it seemed like everything was possible.</p>
+        <p>AI is a big wave. Is it a chance to refresh what's gotten tedious? Cynics and AGI believers are everywhere, and the AI-perbole is deafening.</p>
+        <p>This is a place to experiment, learn, and draw conclusions from capability — showcasing what's real, and what's hype.</p>
+        <p class="manifesto-tagline">Experiments · Systems · AI · Design</p>
       </div>
     </section>
 
@@ -76,10 +77,13 @@
       </figure>
     </section>
 
-    <section class="newsletter">
+    <section class="newsletter" id="newsletter-section">
       <h2>From the Newsletter</h2>
       <div class="newsletter-grid" id="newsletter-feed">
-        <div class="newsletter-loading">Loading posts...</div>
+        <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
       </div>
       <a href="https://newsletter.wirepine.com" class="newsletter-cta">Subscribe to TechTales</a>
     </section>
@@ -147,77 +151,140 @@
   </div>
 
   <script>
-    // Theme toggle
+    // Theme toggle (light is default)
     const toggle = document.getElementById('theme-toggle');
     const root = document.documentElement;
 
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-      root.setAttribute('data-theme', 'light');
-      toggle.textContent = 'Dark';
+    if (savedTheme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      toggle.textContent = 'Light';
     }
 
     toggle.addEventListener('click', () => {
-      const isLight = root.getAttribute('data-theme') === 'light';
+      const isDark = root.getAttribute('data-theme') === 'dark';
 
-      if (isLight) {
+      if (isDark) {
         root.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'dark');
-        toggle.textContent = 'Light';
-      } else {
-        root.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
         toggle.textContent = 'Dark';
+      } else {
+        root.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = 'Light';
       }
     });
 
-    // Newsletter RSS feed
-    async function loadNewsletter() {
-      const feed = document.getElementById('newsletter-feed');
+    // Newsletter RSS feed with caching & lazy loading
+    const CACHE_KEY = 'wirepine_newsletter';
+    const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+    const FETCH_TIMEOUT = 5000; // 5 seconds
+    let newsletterLoaded = false;
+
+    function renderPosts(posts, feed) {
+      feed.innerHTML = posts.map(post => `
+        <a href="${post.link}" class="newsletter-card" target="_blank" rel="noopener">
+          ${post.image ? `<img src="${post.image}" alt="" class="newsletter-image" loading="lazy">` : ''}
+          <div class="newsletter-card-content">
+            <time class="newsletter-date">${post.date}</time>
+            <h3 class="newsletter-title">${post.title}</h3>
+            <p class="newsletter-excerpt">${post.description}</p>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function renderFallback(feed) {
+      feed.innerHTML = '<p class="newsletter-error">Loading took too long. <a href="https://newsletter.wirepine.com">Visit the newsletter →</a></p>';
+    }
+
+    function getCachedPosts() {
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (!cached) return null;
+        const { posts, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp > CACHE_TTL) return null;
+        return posts;
+      } catch { return null; }
+    }
+
+    function cachePosts(posts) {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ posts, timestamp: Date.now() }));
+      } catch {}
+    }
+
+    async function fetchPosts() {
       const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
       const RSS_URL = 'https://newsletter.wirepine.com/feed';
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
       try {
-        const response = await fetch(CORS_PROXY + encodeURIComponent(RSS_URL));
+        const response = await fetch(CORS_PROXY + encodeURIComponent(RSS_URL), { signal: controller.signal });
+        clearTimeout(timeoutId);
         const text = await response.text();
         const parser = new DOMParser();
         const xml = parser.parseFromString(text, 'text/xml');
         const items = xml.querySelectorAll('item');
 
-        const posts = Array.from(items).slice(0, 4).map(item => {
+        return Array.from(items).slice(0, 4).map(item => {
           const title = item.querySelector('title')?.textContent || '';
           const link = item.querySelector('link')?.textContent || '';
           const description = item.querySelector('description')?.textContent || '';
           const pubDate = item.querySelector('pubDate')?.textContent || '';
           const enclosure = item.querySelector('enclosure');
           const image = enclosure?.getAttribute('url') || '';
-
-          const date = new Date(pubDate).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          });
-
+          const date = new Date(pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
           return { title, link, description, date, image };
         });
-
-        feed.innerHTML = posts.map(post => `
-          <a href="${post.link}" class="newsletter-card" target="_blank" rel="noopener">
-            ${post.image ? `<img src="${post.image}" alt="" class="newsletter-image">` : ''}
-            <div class="newsletter-card-content">
-              <time class="newsletter-date">${post.date}</time>
-              <h3 class="newsletter-title">${post.title}</h3>
-              <p class="newsletter-excerpt">${post.description}</p>
-            </div>
-          </a>
-        `).join('');
-
-      } catch (error) {
-        feed.innerHTML = '<p class="newsletter-error">Unable to load posts. <a href="https://newsletter.wirepine.com">Visit the newsletter</a></p>';
+      } catch {
+        clearTimeout(timeoutId);
+        return null;
       }
     }
 
-    loadNewsletter();
+    async function loadNewsletter() {
+      if (newsletterLoaded) return;
+      newsletterLoaded = true;
+
+      const feed = document.getElementById('newsletter-feed');
+      const cached = getCachedPosts();
+
+      // Show cached immediately if available
+      if (cached) {
+        renderPosts(cached, feed);
+        // Refresh in background
+        fetchPosts().then(posts => {
+          if (posts) {
+            cachePosts(posts);
+            renderPosts(posts, feed);
+          }
+        });
+      } else {
+        // No cache - fetch with timeout
+        const posts = await fetchPosts();
+        if (posts) {
+          cachePosts(posts);
+          renderPosts(posts, feed);
+        } else {
+          renderFallback(feed);
+        }
+      }
+    }
+
+    // Lazy load: only fetch when section is visible
+    const newsletterSection = document.getElementById('newsletter-section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadNewsletter();
+          observer.disconnect();
+        }
+      });
+    }, { rootMargin: '100px' });
+    observer.observe(newsletterSection);
 
     // ==========================================
     // TERMINAL MODE - 1980 EASTER EGG

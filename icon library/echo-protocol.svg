@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
   <defs>
-    <linearGradient id="lightningGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#E8F4FF;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#A0C4E8;stop-opacity:1" />
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5d76e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8b931;stop-opacity:1" />
     </linearGradient>
   </defs>
   <rect x="2" y="2" width="44" height="44" rx="8" fill="#1A4D5C" opacity="0.9"/>
-  <path d="M28 18a6 6 0 0 1 0 12" fill="none" stroke="url(#lightningGrad)" stroke-width="1.5" opacity="0.3"/>
-  <path d="M26 20a4 4 0 0 1 0 8" fill="none" stroke="url(#lightningGrad)" stroke-width="1.5" opacity="0.5"/>
-  <circle cx="24" cy="24" r="2.5" fill="url(#lightningGrad)"/>
-  <path d="M20 18a6 6 0 0 0 0 12" fill="none" stroke="url(#lightningGrad)" stroke-width="1.5" opacity="0.3"/>
-  <path d="M22 20a4 4 0 0 0 0 8" fill="none" stroke="url(#lightningGrad)" stroke-width="1.5" opacity="0.5"/>
-  <path d="M28 17l2 2-2 2" stroke="url(#lightningGrad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+  <path d="M28 18a6 6 0 0 1 0 12" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.3"/>
+  <path d="M26 20a4 4 0 0 1 0 8" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="24" cy="24" r="2.5" fill="url(#goldGrad)"/>
+  <path d="M20 18a6 6 0 0 0 0 12" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.3"/>
+  <path d="M22 20a4 4 0 0 0 0 8" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.5"/>
+  <path d="M28 17l2 2-2 2" stroke="url(#goldGrad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
 </svg>
