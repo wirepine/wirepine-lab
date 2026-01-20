@@ -356,31 +356,11 @@ section h2::after {
 }
 
 .artifact-image {
+  width: 100%;
   aspect-ratio: 16 / 10;
-  background: var(--color-artifact-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  object-fit: cover;
   border: 1px solid var(--color-border);
-  position: relative;
-  overflow: hidden;
-}
-
-.artifact-image::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--color-gold) 0%, transparent 50%);
-  opacity: 0.1;
-}
-
-.artifact-image span {
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  border-radius: 4px;
 }
 
 .artifact-figure figcaption {
@@ -629,5 +609,165 @@ section h2::after {
   .artifact-figure {
     grid-template-columns: 1.2fr 0.8fr;
     align-items: center;
+  }
+}
+
+/* ============================================
+   TERMINAL MODE - 1980 EASTER EGG
+   ============================================ */
+
+.terminal-link {
+  opacity: 0.4 !important;
+  font-size: 0.75rem !important;
+}
+
+.terminal-link:hover {
+  opacity: 1 !important;
+}
+
+.terminal-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.terminal-overlay[hidden] {
+  display: none;
+}
+
+.terminal-screen {
+  width: 100%;
+  max-width: 800px;
+  height: 100%;
+  max-height: 600px;
+  background: #0a0a0a;
+  border: 2px solid #0f0;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow:
+    0 0 20px rgba(0, 255, 0, 0.3),
+    inset 0 0 60px rgba(0, 255, 0, 0.05);
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #0f0;
+  color: #000;
+  font-family: "Courier New", monospace;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.terminal-btn {
+  background: #000;
+  color: #0f0;
+  border: 1px solid #0f0;
+  padding: 0.25rem 0.5rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.terminal-btn:hover {
+  background: #0f0;
+  color: #000;
+}
+
+.terminal-content {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ascii-art {
+  color: #0f0;
+  font-family: "Courier New", monospace;
+  font-size: clamp(0.5rem, 1.5vw, 0.875rem);
+  line-height: 1.3;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+  white-space: pre;
+  margin: 0;
+}
+
+/* CRT Scanline Effect */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10000;
+}
+
+/* Asteroids Game */
+.asteroids-game {
+  flex: 1;
+  width: 100%;
+  background: #000;
+}
+
+.asteroids-game[hidden] {
+  display: none;
+}
+
+.asteroids-ui {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #000;
+  border-top: 1px solid #0f0;
+  color: #0f0;
+  font-family: "Courier New", monospace;
+  font-size: 0.875rem;
+}
+
+.asteroids-ui[hidden] {
+  display: none;
+}
+
+.asteroids-ui span {
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+/* Flicker animation for that authentic CRT feel */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+}
+
+.terminal-screen {
+  animation: flicker 4s infinite;
+}
+
+/* Responsive terminal */
+@media (max-width: 600px) {
+  .ascii-art {
+    font-size: 0.45rem;
+  }
+
+  .terminal-header {
+    font-size: 0.75rem;
   }
 }

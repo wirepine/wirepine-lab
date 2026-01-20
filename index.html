@@ -68,9 +68,7 @@
     <section class="artifact">
       <h2>Featured Artifact</h2>
       <figure class="artifact-figure">
-        <div class="artifact-image" aria-label="Featured artifact placeholder">
-          <span>Artifact 001</span>
-        </div>
+        <img src="Featured Artifact section hero.png" alt="Topology of Thought - a generative study on the shape of reasoning" class="artifact-image">
         <figcaption>
           <strong>Topology of Thought</strong>
           <span>A generative study on the shape of reasoning—mapping how ideas connect, diverge, and reconverge through iterative AI collaboration.</span>
@@ -92,10 +90,61 @@
       <div class="footer-links">
         <a href="https://wirepine.com">wirepine.com</a>
         <a href="https://newsletter.wirepine.com">newsletter</a>
+        <a href="#" id="terminal-trigger" class="terminal-link">view in 1980</a>
       </div>
       <p class="footer-copyright">&copy; 2025 Wirepine Lab. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Terminal Mode Overlay -->
+  <div id="terminal-mode" class="terminal-overlay" hidden>
+    <div class="terminal-screen">
+      <div class="terminal-header">
+        <span>WIREPINE TERMINAL v1.0</span>
+        <button id="terminal-close" class="terminal-btn">[X] EXIT</button>
+      </div>
+      <div class="terminal-content" id="terminal-content">
+        <pre class="ascii-art">
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   █   █ █ █▀▄ █▀▀ █▀█ █ █▄ █ █▀▀   █   █▀█ █▄▄                │
+│   ▀▄▀▄▀ █ █▀▄ ██▄ █▀▀ █ █ ▀█ ██▄   █▄▄ █▀█ █▄█                │
+│                                                                 │
+│            An AI-native experimental studio                     │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   MANIFESTO                                                     │
+│   ─────────                                                     │
+│   We build at the intersection of artificial intelligence       │
+│   and human intent. Where WordPress offered templates,          │
+│   we offer transformation.                                      │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   EXPERIMENTS                                                   │
+│   ───────────                                                   │
+│   [■] Semantic Drift      [■] Pattern Emergence                 │
+│   [■] Interface Zero      [■] Synthetic Memory                  │
+│   [■] Constraint Gardens  [■] Echo Protocol                     │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   > Press [A] to play ASTEROIDS                                 │
+│   > Press [ESC] to return to 2025                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+        </pre>
+      </div>
+      <canvas id="asteroids-canvas" class="asteroids-game" hidden></canvas>
+      <div id="asteroids-ui" class="asteroids-ui" hidden>
+        <span>SCORE: <span id="asteroids-score">0</span></span>
+        <span>LIVES: <span id="asteroids-lives">3</span></span>
+        <button id="asteroids-back" class="terminal-btn">[ESC] BACK</button>
+      </div>
+    </div>
+    <div class="crt-overlay"></div>
+  </div>
 
   <script>
     // Theme toggle
@@ -169,6 +218,363 @@
     }
 
     loadNewsletter();
+
+    // ==========================================
+    // TERMINAL MODE - 1980 EASTER EGG
+    // ==========================================
+    const terminalOverlay = document.getElementById('terminal-mode');
+    const terminalTrigger = document.getElementById('terminal-trigger');
+    const terminalClose = document.getElementById('terminal-close');
+    const terminalContent = document.getElementById('terminal-content');
+    const asteroidsCanvas = document.getElementById('asteroids-canvas');
+    const asteroidsUI = document.getElementById('asteroids-ui');
+    const asteroidsBack = document.getElementById('asteroids-back');
+    const scoreDisplay = document.getElementById('asteroids-score');
+    const livesDisplay = document.getElementById('asteroids-lives');
+
+    let asteroidsGame = null;
+
+    terminalTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      terminalOverlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+
+    terminalClose.addEventListener('click', () => {
+      closeTerminal();
+    });
+
+    function closeTerminal() {
+      terminalOverlay.hidden = true;
+      document.body.style.overflow = '';
+      if (asteroidsGame) {
+        asteroidsGame.stop();
+        asteroidsGame = null;
+      }
+      showTerminalContent();
+    }
+
+    function showTerminalContent() {
+      terminalContent.hidden = false;
+      asteroidsCanvas.hidden = true;
+      asteroidsUI.hidden = true;
+    }
+
+    function showAsteroids() {
+      terminalContent.hidden = true;
+      asteroidsCanvas.hidden = false;
+      asteroidsUI.hidden = false;
+      startAsteroids();
+    }
+
+    asteroidsBack.addEventListener('click', () => {
+      if (asteroidsGame) {
+        asteroidsGame.stop();
+        asteroidsGame = null;
+      }
+      showTerminalContent();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (terminalOverlay.hidden) return;
+
+      if (e.key === 'Escape') {
+        if (!asteroidsCanvas.hidden) {
+          if (asteroidsGame) {
+            asteroidsGame.stop();
+            asteroidsGame = null;
+          }
+          showTerminalContent();
+        } else {
+          closeTerminal();
+        }
+      }
+
+      if ((e.key === 'a' || e.key === 'A') && !terminalContent.hidden) {
+        showAsteroids();
+      }
+    });
+
+    // ==========================================
+    // ASTEROIDS GAME
+    // ==========================================
+    function startAsteroids() {
+      const canvas = asteroidsCanvas;
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas size
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth - 4;
+      canvas.height = container.clientHeight - 100;
+
+      let animationId;
+      let gameRunning = true;
+      let score = 0;
+      let lives = 3;
+
+      // Ship
+      const ship = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 15,
+        angle: -Math.PI / 2,
+        rotation: 0,
+        thrusting: false,
+        thrust: { x: 0, y: 0 },
+        bullets: []
+      };
+
+      // Asteroids
+      let asteroids = [];
+      const ASTEROID_COUNT = 5;
+
+      function createAsteroid(x, y, radius) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1 + Math.random() * 2;
+        return {
+          x: x || Math.random() * canvas.width,
+          y: y || Math.random() * canvas.height,
+          radius: radius || 40 + Math.random() * 20,
+          angle: angle,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          vertices: Math.floor(8 + Math.random() * 6),
+          offsets: Array.from({ length: 14 }, () => 0.7 + Math.random() * 0.4)
+        };
+      }
+
+      function initAsteroids() {
+        asteroids = [];
+        for (let i = 0; i < ASTEROID_COUNT; i++) {
+          let a = createAsteroid();
+          // Make sure asteroid doesn't spawn on ship
+          while (Math.hypot(a.x - ship.x, a.y - ship.y) < 100) {
+            a = createAsteroid();
+          }
+          asteroids.push(a);
+        }
+      }
+
+      // Input
+      const keys = {};
+      function handleKeyDown(e) {
+        keys[e.key] = true;
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+          e.preventDefault();
+        }
+      }
+      function handleKeyUp(e) {
+        keys[e.key] = false;
+      }
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+
+      function shoot() {
+        ship.bullets.push({
+          x: ship.x + Math.cos(ship.angle) * ship.radius,
+          y: ship.y + Math.sin(ship.angle) * ship.radius,
+          vx: Math.cos(ship.angle) * 8,
+          vy: Math.sin(ship.angle) * 8,
+          life: 60
+        });
+      }
+
+      let canShoot = true;
+
+      function update() {
+        // Rotation
+        if (keys['ArrowLeft']) ship.angle -= 0.08;
+        if (keys['ArrowRight']) ship.angle += 0.08;
+
+        // Thrust
+        if (keys['ArrowUp']) {
+          ship.thrust.x += Math.cos(ship.angle) * 0.15;
+          ship.thrust.y += Math.sin(ship.angle) * 0.15;
+          ship.thrusting = true;
+        } else {
+          ship.thrusting = false;
+        }
+
+        // Shoot
+        if (keys[' '] && canShoot) {
+          shoot();
+          canShoot = false;
+          setTimeout(() => canShoot = true, 200);
+        }
+
+        // Apply thrust with friction
+        ship.x += ship.thrust.x;
+        ship.y += ship.thrust.y;
+        ship.thrust.x *= 0.99;
+        ship.thrust.y *= 0.99;
+
+        // Wrap ship
+        if (ship.x < 0) ship.x = canvas.width;
+        if (ship.x > canvas.width) ship.x = 0;
+        if (ship.y < 0) ship.y = canvas.height;
+        if (ship.y > canvas.height) ship.y = 0;
+
+        // Update bullets
+        ship.bullets = ship.bullets.filter(b => {
+          b.x += b.vx;
+          b.y += b.vy;
+          b.life--;
+          // Wrap bullets
+          if (b.x < 0) b.x = canvas.width;
+          if (b.x > canvas.width) b.x = 0;
+          if (b.y < 0) b.y = canvas.height;
+          if (b.y > canvas.height) b.y = 0;
+          return b.life > 0;
+        });
+
+        // Update asteroids
+        asteroids.forEach(a => {
+          a.x += a.vx;
+          a.y += a.vy;
+          // Wrap
+          if (a.x < -a.radius) a.x = canvas.width + a.radius;
+          if (a.x > canvas.width + a.radius) a.x = -a.radius;
+          if (a.y < -a.radius) a.y = canvas.height + a.radius;
+          if (a.y > canvas.height + a.radius) a.y = -a.radius;
+        });
+
+        // Collision: bullets vs asteroids
+        ship.bullets.forEach((b, bi) => {
+          asteroids.forEach((a, ai) => {
+            if (Math.hypot(b.x - a.x, b.y - a.y) < a.radius) {
+              // Hit!
+              ship.bullets.splice(bi, 1);
+              score += Math.floor(100 / a.radius * 10);
+              scoreDisplay.textContent = score;
+
+              // Split asteroid
+              if (a.radius > 20) {
+                asteroids.push(createAsteroid(a.x, a.y, a.radius / 2));
+                asteroids.push(createAsteroid(a.x, a.y, a.radius / 2));
+              }
+              asteroids.splice(ai, 1);
+            }
+          });
+        });
+
+        // Collision: ship vs asteroids
+        asteroids.forEach(a => {
+          if (Math.hypot(ship.x - a.x, ship.y - a.y) < ship.radius + a.radius - 10) {
+            lives--;
+            livesDisplay.textContent = lives;
+            // Reset ship
+            ship.x = canvas.width / 2;
+            ship.y = canvas.height / 2;
+            ship.thrust = { x: 0, y: 0 };
+            if (lives <= 0) {
+              gameOver();
+            }
+          }
+        });
+
+        // Level complete
+        if (asteroids.length === 0) {
+          initAsteroids();
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#0f0';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = '#0f0';
+        ctx.shadowBlur = 10;
+
+        // Draw ship
+        ctx.save();
+        ctx.translate(ship.x, ship.y);
+        ctx.rotate(ship.angle);
+        ctx.beginPath();
+        ctx.moveTo(ship.radius, 0);
+        ctx.lineTo(-ship.radius * 0.7, -ship.radius * 0.6);
+        ctx.lineTo(-ship.radius * 0.4, 0);
+        ctx.lineTo(-ship.radius * 0.7, ship.radius * 0.6);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Thrust flame
+        if (ship.thrusting) {
+          ctx.beginPath();
+          ctx.moveTo(-ship.radius * 0.4, 0);
+          ctx.lineTo(-ship.radius * 1.2, -ship.radius * 0.2);
+          ctx.lineTo(-ship.radius * 1.5, 0);
+          ctx.lineTo(-ship.radius * 1.2, ship.radius * 0.2);
+          ctx.closePath();
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Draw bullets
+        ship.bullets.forEach(b => {
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#0f0';
+        });
+
+        // Draw asteroids
+        asteroids.forEach(a => {
+          ctx.beginPath();
+          for (let i = 0; i < a.vertices; i++) {
+            const angle = (i / a.vertices) * Math.PI * 2;
+            const r = a.radius * a.offsets[i];
+            const x = a.x + Math.cos(angle) * r;
+            const y = a.y + Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        });
+
+        ctx.shadowBlur = 0;
+      }
+
+      function gameOver() {
+        gameRunning = false;
+        ctx.fillStyle = '#0f0';
+        ctx.font = '30px "Courier New"';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#0f0';
+        ctx.shadowBlur = 20;
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+        ctx.font = '16px "Courier New"';
+        ctx.fillText('Score: ' + score, canvas.width / 2, canvas.height / 2 + 40);
+        ctx.fillText('Press ESC to return', canvas.width / 2, canvas.height / 2 + 70);
+      }
+
+      function gameLoop() {
+        if (!gameRunning) return;
+        update();
+        draw();
+        animationId = requestAnimationFrame(gameLoop);
+      }
+
+      // Initialize
+      score = 0;
+      lives = 3;
+      scoreDisplay.textContent = score;
+      livesDisplay.textContent = lives;
+      initAsteroids();
+      gameLoop();
+
+      // Return stop function
+      asteroidsGame = {
+        stop: () => {
+          gameRunning = false;
+          cancelAnimationFrame(animationId);
+          document.removeEventListener('keydown', handleKeyDown);
+          document.removeEventListener('keyup', handleKeyUp);
+        }
+      };
+    }
   </script>
 </body>
 </html>
