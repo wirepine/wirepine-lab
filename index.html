@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wirepine Lab</title>
+  <link rel="icon" type="image/png" href="Wirepine Lab Transparent v1.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -69,10 +70,10 @@
     <section class="artifact">
       <h2>Featured Artifact</h2>
       <figure class="artifact-figure">
-        <img src="Featured Artifact section hero.png" alt="Topology of Thought - a generative study on the shape of reasoning" class="artifact-image">
+        <img src="Featured Artifact section hero.png" alt="How this was Built - Wirepine Lab built with Claude Code" class="artifact-image">
         <figcaption>
-          <strong>Topology of Thought</strong>
-          <span>A generative study on the shape of reasoning—mapping how ideas connect, diverge, and reconverge through iterative AI collaboration.</span>
+          <strong>How this was Built</strong>
+          <span>Wirepine Lab was built with Claude Code, end to end. Version one started deliberately simple and took an hour: a simple static site shaped by the new Wirepine visual language, designed to complement the main site and the newsletter — not replace them. Version two focused on refinement rather than reinvention and took a few more hours: tightening the design, clarifying intent, and wiring up deployment so changes flow cleanly from idea to code to production. No CMS. No plugin stack. Just experimentation, iteration, and a shorter distance between thinking and a live URL.</span>
         </figcaption>
       </figure>
     </section>
@@ -96,9 +97,12 @@
         <a href="https://newsletter.wirepine.com">newsletter</a>
         <a href="#" id="terminal-trigger" class="terminal-link">view in 1980</a>
       </div>
-      <p class="footer-copyright">&copy; 2025 Wirepine Lab. All rights reserved.</p>
+      <p class="footer-copyright">&copy; 2026 Wirepine Lab. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Matrix Rain Transition -->
+  <canvas id="matrix-canvas" class="matrix-canvas" hidden></canvas>
 
   <!-- Terminal Mode Overlay -->
   <div id="terminal-mode" class="terminal-overlay" hidden>
@@ -136,7 +140,7 @@
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   <span class="desktop-only">> Press [A] to play ASTEROIDS                                 </span><span class="mobile-only">> View on desktop to play ASTEROIDS                           </span>│
-│   > Press [ESC] to return to 2025                               │
+│   > Press [ESC] to return to 2026                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
         </pre>
@@ -299,13 +303,132 @@
     const asteroidsBack = document.getElementById('asteroids-back');
     const scoreDisplay = document.getElementById('asteroids-score');
     const livesDisplay = document.getElementById('asteroids-lives');
+    const matrixCanvas = document.getElementById('matrix-canvas');
 
     let asteroidsGame = null;
 
+    // ==========================================
+    // MATRIX RAIN TRANSITION
+    // ==========================================
+    function playMatrixTransition(callback) {
+      const canvas = matrixCanvas;
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas size
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.hidden = false;
+      document.body.style.overflow = 'hidden';
+
+      const fontSize = 16;
+      const columns = Math.floor(canvas.width / fontSize);
+
+      // Array of drops - one per column, with individual speeds
+      const drops = [];
+      const speeds = [];
+      const active = []; // Whether this column is active
+      for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * -50;
+        speeds[i] = 0.5 + Math.random() * 0.5; // Base speed
+        active[i] = Math.random() > 0.7; // Start with ~30% columns active
+      }
+
+      const chars = '01';
+      let frameCount = 0;
+      const duration = 180; // ~3 seconds at 60fps
+      let animationId;
+
+      function draw() {
+        // Progress from 0 to 1
+        const progress = frameCount / duration;
+
+        // Speed multiplier increases over time (1x to 3x)
+        const speedMultiplier = 1 + progress * 2;
+
+        // Density increases over time - activate more columns
+        const activationChance = 0.02 + progress * 0.08;
+
+        // Fade trail - shorter trail as speed increases
+        const fadeAmount = 0.03 + progress * 0.04;
+        ctx.fillStyle = `rgba(0, 0, 0, ${fadeAmount})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.font = fontSize + 'px monospace';
+        ctx.shadowColor = '#0f0';
+        ctx.shadowBlur = 8 + progress * 8;
+
+        for (let i = 0; i < drops.length; i++) {
+          // Activate inactive columns over time
+          if (!active[i] && Math.random() < activationChance) {
+            active[i] = true;
+            drops[i] = 0;
+          }
+
+          if (!active[i]) continue;
+
+          // Random character
+          const char = chars[Math.floor(Math.random() * chars.length)];
+
+          // Draw character
+          const x = i * fontSize;
+          const y = drops[i] * fontSize;
+
+          // Brighter leading character
+          if (Math.random() > 0.5) {
+            ctx.fillStyle = '#fff';
+          } else {
+            ctx.fillStyle = '#0f0';
+          }
+
+          ctx.fillText(char, x, y);
+
+          // Move drop down with increasing speed
+          drops[i] += speeds[i] * speedMultiplier;
+
+          // Reset drop to top - more likely to reset as time goes on (more density)
+          const resetChance = 0.975 - progress * 0.02;
+          if (drops[i] * fontSize > canvas.height && Math.random() > resetChance) {
+            drops[i] = 0;
+            speeds[i] = 0.5 + Math.random() * 0.5 + progress; // Faster respawns over time
+          }
+        }
+
+        ctx.shadowBlur = 0;
+        frameCount++;
+
+        if (frameCount < duration) {
+          animationId = requestAnimationFrame(draw);
+        } else {
+          // Fade out and transition
+          fadeOut();
+        }
+      }
+
+      function fadeOut() {
+        let opacity = 1;
+        function fade() {
+          opacity -= 0.05;
+          ctx.fillStyle = `rgba(0, 0, 0, ${0.1})`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          if (opacity > 0) {
+            requestAnimationFrame(fade);
+          } else {
+            canvas.hidden = true;
+            callback();
+          }
+        }
+        fade();
+      }
+
+      draw();
+    }
+
     terminalTrigger.addEventListener('click', (e) => {
       e.preventDefault();
-      terminalOverlay.hidden = false;
-      document.body.style.overflow = 'hidden';
+      playMatrixTransition(() => {
+        terminalOverlay.hidden = false;
+      });
     });
 
     terminalClose.addEventListener('click', () => {

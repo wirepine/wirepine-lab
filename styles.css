@@ -108,10 +108,9 @@ body {
 
 /* Hero */
 .hero {
-  min-height: 80vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid var(--color-border);
   position: relative;
   overflow: hidden;
 }
@@ -124,6 +123,7 @@ body {
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   z-index: 0;
 }
 
@@ -133,23 +133,30 @@ body {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(26, 58, 74, 0.3) 0%,
-    rgba(26, 58, 74, 0.5) 100%
+    rgba(26, 58, 74, 0.15) 0%,
+    rgba(26, 58, 74, 0.3) 55%,
+    rgba(245, 245, 240, 0.65) 88%,
+    rgba(245, 245, 240, 0.9) 100%
   );
 }
 
 [data-theme="dark"] .hero-bg::after {
   background: linear-gradient(
     to bottom,
-    rgba(26, 74, 79, 0.4) 0%,
-    rgba(26, 74, 79, 0.65) 100%
+    rgba(26, 74, 79, 0.3) 0%,
+    rgba(26, 74, 79, 0.5) 50%,
+    rgba(26, 74, 79, 0.9) 85%,
+    rgba(26, 74, 79, 1) 100%
   );
 }
 
 .hero-content {
   max-width: var(--max-width);
-  margin: auto;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0 var(--space-md) var(--space-xl);
+  padding-bottom: 8vh;
   position: relative;
   z-index: 2;
   width: 100%;
@@ -576,7 +583,11 @@ section h2::after {
   }
 
   .hero {
-    min-height: 60vh;
+    min-height: 70vh;
+  }
+
+  .hero-bg {
+    background-attachment: scroll;
   }
 
   .hero::before {
@@ -815,4 +826,19 @@ section h2::after {
   .mobile-only {
     display: inline;
   }
+}
+
+/* Matrix Rain Transition */
+.matrix-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: #000;
+}
+
+.matrix-canvas[hidden] {
+  display: none;
 }
