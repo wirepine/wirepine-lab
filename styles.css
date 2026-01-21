@@ -120,7 +120,7 @@ body {
   inset: 0;
   background-color: #1a3a4a;
   background-image: url('Lightening Pine Hero v1.png');
-  background-position: center center;
+  background-position: center 35%;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -133,10 +133,11 @@ body {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(26, 58, 74, 0.15) 0%,
-    rgba(26, 58, 74, 0.3) 55%,
-    rgba(245, 245, 240, 0.65) 88%,
-    rgba(245, 245, 240, 0.9) 100%
+    rgba(26, 58, 74, 0.35) 0%,
+    rgba(26, 58, 74, 0.25) 40%,
+    rgba(26, 58, 74, 0.15) 60%,
+    rgba(245, 245, 240, 0.5) 85%,
+    rgba(245, 245, 240, 0.95) 100%
   );
 }
 

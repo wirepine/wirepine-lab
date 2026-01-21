@@ -24,9 +24,9 @@
     <section class="manifesto">
       <div class="manifesto-content">
         <h2>Imagine</h2>
-        <p><span class="drop-cap">W</span>irepine Lab channels the energy of the early web — when it felt like the internet connected us, information flowed freely, and we weren't buried under feeds and ads. A Golden Age, when it seemed like everything was possible.</p>
-        <p>AI is a big wave. Is it a chance to refresh what's gotten tedious? Cynics and AGI believers are everywhere, and the AI-perbole is deafening.</p>
-        <p>This is a place to experiment, learn, and draw conclusions from capability — showcasing what's real, and what's hype.</p>
+        <p><span class="drop-cap">W</span>irepine Lab is seeking the energy of the early web — when it felt like the internet connected us, information flowed freely, and we weren't buried under feeds and ads. A Golden Age, when it seemed like everything was possible.</p>
+        <p>AI is a big wave. Is it a chance to refresh what's gotten tedious? Cynics and AGI believers are everywhere, and the AI-perbole can be deafening.</p>
+        <p>This is a place to experiment, learn, and draw conclusions from capability — showcasing what's real, not hype.</p>
         <p class="manifesto-tagline">Experiments · Systems · AI · Design</p>
       </div>
     </section>
@@ -73,7 +73,7 @@
         <img src="Featured Artifact section hero.png" alt="How this was Built - Wirepine Lab built with Claude Code" class="artifact-image">
         <figcaption>
           <strong>How this was Built</strong>
-          <span>Wirepine Lab was built with Claude Code, end to end. Version one started deliberately simple and took an hour: a simple static site shaped by the new Wirepine visual language, designed to complement the main site and the newsletter — not replace them. Version two focused on refinement rather than reinvention and took a few more hours: tightening the design, clarifying intent, and wiring up deployment so changes flow cleanly from idea to code to production. No CMS. No plugin stack. Just experimentation, iteration, and a shorter distance between thinking and a live URL.</span>
+          <span>Wirepine Lab was built with Claude Code, end to end. Version one started deliberately simple and took an hour: a simple static site shaped by the new Wirepine visual language, designed to complement the main site and the newsletter — not replace them. Version two focused on refinement rather than reinvention and took a few more hours: tightening the design, clarifying intent, and wiring up deployment so changes flow cleanly from idea to code to production.  <br><br> No CMS. No plugin stack. Just experimentation, iteration, and a shorter distance between thinking and a live URL.</span>
         </figcaption>
       </figure>
     </section>
@@ -95,7 +95,7 @@
       <div class="footer-links">
         <a href="https://wirepine.com">wirepine.com</a>
         <a href="https://newsletter.wirepine.com">newsletter</a>
-        <a href="#" id="terminal-trigger" class="terminal-link">view in 1980</a>
+        <a href="#" id="terminal-trigger" class="terminal-link">view in 1999</a>
       </div>
       <p class="footer-copyright">&copy; 2026 Wirepine Lab. All rights reserved.</p>
     </div>
@@ -115,8 +115,8 @@
         <pre class="ascii-art">
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
-│   █   █ █ █▀▄ █▀▀ █▀█ █ █▄ █ █▀▀   █   █▀█ █▄▄                │
-│   ▀▄▀▄▀ █ █▀▄ ██▄ █▀▀ █ █ ▀█ ██▄   █▄▄ █▀█ █▄█                │
+│   █   █ █ █▀▄ █▀▀ █▀█ █ █▄ █ █▀▀   █   █▀█ █▄▄                  │
+│   ▀▄▀▄▀ █ █▀▄ ██▄ █▀▀ █ █ ▀█ ██▄   █▄▄ █▀█ █▄█                  │
 │                                                                 │
 │            An AI-native experimental studio                     │
 │                                                                 │
@@ -124,7 +124,7 @@
 │                                                                 │
 │   IMAGINE                                                       │
 │   ───────                                                       │
-│   Wirepine Lab channels the energy of the early web — when      │
+│   Wirepine Lab is seeking the energy of the early web — when    │
 │   it felt like the internet connected us, information flowed    │
 │   freely, and we weren't buried under feeds and ads. A Golden   │
 │   Age, when it seemed like everything was possible.             │
@@ -183,7 +183,7 @@
     // Newsletter RSS feed with caching & lazy loading
     const CACHE_KEY = 'wirepine_newsletter';
     const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-    const FETCH_TIMEOUT = 5000; // 5 seconds
+    const FETCH_TIMEOUT = 8000; // 8 seconds
     let newsletterLoaded = false;
 
     function renderPosts(posts, feed) {
@@ -220,14 +220,14 @@
     }
 
     async function fetchPosts() {
-      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+      const CORS_PROXY = 'https://corsproxy.io/?';
       const RSS_URL = 'https://newsletter.wirepine.com/feed';
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
 
       try {
-        const response = await fetch(CORS_PROXY + encodeURIComponent(RSS_URL), { signal: controller.signal });
+        const response = await fetch(CORS_PROXY + RSS_URL, { signal: controller.signal });
         clearTimeout(timeoutId);
         const text = await response.text();
         const parser = new DOMParser();
@@ -335,7 +335,7 @@
 
       const chars = '01';
       let frameCount = 0;
-      const duration = 180; // ~3 seconds at 60fps
+      const duration = 200; // ~3 seconds at 60fps
       let animationId;
 
       function draw() {
