@@ -170,6 +170,11 @@ body {
   letter-spacing: -0.03em;
   line-height: 0.95;
   margin-bottom: var(--space-sm);
+  text-shadow: 0 2px 12px rgba(245, 245, 240, 0.6);
+}
+
+[data-theme="dark"] .hero-title {
+  text-shadow: 0 2px 16px rgba(245, 245, 240, 0.3);
 }
 
 .hero-title .wire {
@@ -200,8 +205,14 @@ body {
   font-family: var(--font-serif);
   font-size: 1.25rem;
   font-style: italic;
-  color: var(--color-text-muted);
+  color: var(--color-gold);
   max-width: 500px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .hero-subtitle {
+  color: var(--color-text-muted);
+  text-shadow: 0 1px 12px rgba(245, 245, 240, 0.25);
 }
 
 /* Section Styles */
@@ -581,6 +592,7 @@ section h2::after {
 @media (min-width: 601px) and (max-width: 1024px) {
   .hero-bg {
     background-position: center 55%;
+    background-attachment: scroll; /* iOS Safari doesn't handle fixed well */
   }
 }
 

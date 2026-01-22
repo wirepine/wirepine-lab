@@ -156,12 +156,15 @@
   </div>
 
   <script>
-    // Theme toggle (light is default)
+    // Theme toggle (dark is default)
     const toggle = document.getElementById('theme-toggle');
     const root = document.documentElement;
 
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
+    if (savedTheme === 'light') {
+      root.removeAttribute('data-theme');
+      toggle.textContent = 'Dark';
+    } else {
       root.setAttribute('data-theme', 'dark');
       toggle.textContent = 'Light';
     }
