@@ -142,6 +142,8 @@
 │   <span class="desktop-only">> Press [A] to play ASTEROIDS                                 </span><span class="mobile-only">> View on desktop to play ASTEROIDS                           </span>│
 │   > Press [ESC] to return to 2026                               │
 │                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│   PUNKS: <span id="view-count">...</span>                                                   │
 └─────────────────────────────────────────────────────────────────┘
         </pre>
       </div>
@@ -182,6 +184,14 @@
         toggle.textContent = 'Light';
       }
     });
+
+    // Page view counter (displayed in terminal easter egg)
+    fetch('https://abacus.jasoncameron.dev/hit/wirepine-lab/pageviews')
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('view-count').textContent = data.value.toLocaleString();
+      })
+      .catch(() => {});
 
     // Newsletter RSS feed with caching & lazy loading
     const CACHE_KEY = 'wirepine_newsletter';
