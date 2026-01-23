@@ -65,6 +65,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Prevent iOS Safari from adding extra scroll space */
+html, body {
+  max-width: 100%;
 }
 
 /* Navigation */
