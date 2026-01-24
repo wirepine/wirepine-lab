@@ -237,6 +237,7 @@
     async function fetchPosts() {
       const CORS_PROXY = 'https://corsproxy.io/?';
       const RSS_URL = 'https://newsletter.wirepine.com/feed';
+      const PINNED_URL = 'https://newsletter.wirepine.com/p/the-ai-pocalypse-is-over';
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
@@ -249,7 +250,7 @@
         const xml = parser.parseFromString(text, 'text/xml');
         const items = xml.querySelectorAll('item');
 
-        return Array.from(items).slice(0, 6).map(item => {
+        const posts = Array.from(items).map(item => {
           const title = item.querySelector('title')?.textContent || '';
           const link = item.querySelector('link')?.textContent || '';
           const description = item.querySelector('description')?.textContent || '';
@@ -259,6 +260,15 @@
           const date = new Date(pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
           return { title, link, description, date, image };
         });
+
+        // Pin article to first position
+        const pinnedIndex = posts.findIndex(p => p.link === PINNED_URL);
+        if (pinnedIndex > 0) {
+          const [pinned] = posts.splice(pinnedIndex, 1);
+          posts.unshift(pinned);
+        }
+
+        return posts.slice(0, 6);
       } catch {
         clearTimeout(timeoutId);
         return null;
