@@ -79,12 +79,14 @@
     </section>
 
     <section class="newsletter" id="newsletter-section">
-      <h2>From the Newsletter</h2>
+      <h2>From TechTales</h2>
       <div class="newsletter-grid" id="newsletter-feed">
         <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
         <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
         <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
         <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        <div class="skeleton-card desktop-only"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        <div class="skeleton-card desktop-only"><div class="skeleton-image"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
       </div>
       <a href="https://newsletter.wirepine.com" class="newsletter-cta">Subscribe to TechTales</a>
     </section>
@@ -247,7 +249,7 @@
         const xml = parser.parseFromString(text, 'text/xml');
         const items = xml.querySelectorAll('item');
 
-        return Array.from(items).slice(0, 4).map(item => {
+        return Array.from(items).slice(0, 6).map(item => {
           const title = item.querySelector('title')?.textContent || '';
           const link = item.querySelector('link')?.textContent || '';
           const description = item.querySelector('description')?.textContent || '';

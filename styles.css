@@ -640,6 +640,11 @@ section h2::after {
     grid-template-columns: 1fr 1fr;
   }
 
+  .newsletter-grid > :nth-child(n+5),
+  .desktop-only {
+    display: none;
+  }
+
   .footer-content {
     flex-direction: column;
     text-align: center;
