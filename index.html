@@ -235,7 +235,7 @@
     }
 
     async function fetchPosts() {
-      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+      const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
       const RSS_URL = 'https://newsletter.wirepine.com/feed';
       const PINNED_URL = 'https://newsletter.wirepine.com/p/the-ai-pocalypse-is-over';
 
@@ -243,22 +243,15 @@
       const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
 
       try {
-        const response = await fetch(CORS_PROXY + RSS_URL, { signal: controller.signal });
+        const response = await fetch(RSS2JSON + encodeURIComponent(RSS_URL), { signal: controller.signal });
         clearTimeout(timeoutId);
-        const text = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(text, 'text/xml');
-        const items = xml.querySelectorAll('item');
+        const data = await response.json();
+        if (data.status !== 'ok') return null;
 
-        const posts = Array.from(items).map(item => {
-          const title = item.querySelector('title')?.textContent || '';
-          const link = item.querySelector('link')?.textContent || '';
-          const description = item.querySelector('description')?.textContent || '';
-          const pubDate = item.querySelector('pubDate')?.textContent || '';
-          const enclosure = item.querySelector('enclosure');
-          const image = enclosure?.getAttribute('url') || '';
-          const date = new Date(pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-          return { title, link, description, date, image };
+        const posts = data.items.map(item => {
+          const date = new Date(item.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const image = item.enclosure?.link || item.thumbnail || '';
+          return { title: item.title, link: item.link, description: item.description, date, image };
         });
 
         // Pin article to first position
