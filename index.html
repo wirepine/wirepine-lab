@@ -187,13 +187,15 @@
       }
     });
 
-    // Carousel drag-to-scroll for desktop
+    // Carousel: drag-to-scroll + autoplay
     (function() {
       const carousel = document.querySelector('.experiments-grid');
       let isDown = false;
       let startX;
       let scrollLeft;
+      let autoplayInterval;
 
+      // Drag-to-scroll
       carousel.addEventListener('mousedown', (e) => {
         isDown = true;
         carousel.classList.add('dragging');
@@ -204,6 +206,7 @@
       carousel.addEventListener('mouseleave', () => {
         isDown = false;
         carousel.classList.remove('dragging');
+        startAutoplay();
       });
 
       carousel.addEventListener('mouseup', () => {
@@ -218,6 +221,40 @@
         const walk = (x - startX) * 2;
         carousel.scrollLeft = scrollLeft - walk;
       });
+
+      // Autoplay — 2s between rotations, pause on hover/touch
+      function getCardWidth() {
+        const card = carousel.querySelector('.experiment-card');
+        if (!card) return 0;
+        const gap = parseFloat(getComputedStyle(carousel).gap) || 0;
+        return card.offsetWidth + gap;
+      }
+
+      function autoScroll() {
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        if (carousel.scrollLeft >= maxScroll - 1) {
+          carousel.style.scrollBehavior = 'auto';
+          carousel.scrollLeft = 0;
+          carousel.style.scrollBehavior = '';
+        } else {
+          carousel.scrollBy({ left: getCardWidth(), behavior: 'smooth' });
+        }
+      }
+
+      function startAutoplay() {
+        stopAutoplay();
+        autoplayInterval = setInterval(autoScroll, 2000);
+      }
+
+      function stopAutoplay() {
+        clearInterval(autoplayInterval);
+      }
+
+      carousel.addEventListener('mouseenter', stopAutoplay);
+      carousel.addEventListener('touchstart', stopAutoplay, { passive: true });
+      carousel.addEventListener('touchend', startAutoplay);
+
+      startAutoplay();
     })();
 
     // Page view counter (displayed in terminal easter egg)
