@@ -79,8 +79,18 @@ html, body {
   align-items: center;
   padding: var(--space-sm) var(--space-md);
   gap: var(--space-sm);
-  position: relative;
-  z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nav.scrolled {
+  background: var(--color-bg);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-logo {
@@ -92,6 +102,10 @@ html, body {
 
 .nav-logo:hover {
   transform: scale(1.05);
+}
+
+html:not([data-theme="dark"]) .nav.scrolled .nav-logo {
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
 }
 
 .theme-toggle {
@@ -115,6 +129,7 @@ html, body {
 /* Hero */
 .hero {
   min-height: 90vh;
+  padding-top: 60px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -139,21 +154,21 @@ html, body {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(26, 58, 74, 0.35) 0%,
-    rgba(26, 58, 74, 0.25) 40%,
-    rgba(26, 58, 74, 0.15) 60%,
-    rgba(245, 245, 240, 0.4) 85%,
-    rgba(245, 245, 240, 0.65) 100%
+    rgba(26, 58, 74, 0.55) 0%,
+    rgba(26, 58, 74, 0.45) 40%,
+    rgba(26, 58, 74, 0.35) 60%,
+    rgba(245, 245, 240, 0.6) 85%,
+    rgba(245, 245, 240, 0.85) 100%
   );
 }
 
 [data-theme="dark"] .hero-bg::after {
   background: linear-gradient(
     to bottom,
-    rgba(26, 74, 79, 0.15) 0%,
-    rgba(26, 74, 79, 0.3) 50%,
-    rgba(26, 74, 79, 0.7) 85%,
-    rgba(26, 74, 79, 0.9) 100%
+    rgba(26, 74, 79, 0.35) 0%,
+    rgba(26, 74, 79, 0.5) 50%,
+    rgba(26, 74, 79, 0.9) 85%,
+    rgba(26, 74, 79, 1.0) 100%
   );
 }
 
@@ -293,29 +308,12 @@ section h2::after {
 }
 
 .experiments-grid {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-sm);
-  cursor: grab;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.experiments-grid::-webkit-scrollbar {
-  display: none;
-}
-
-.experiments-grid.dragging {
-  scroll-behavior: auto;
-  cursor: grabbing;
-  user-select: none;
 }
 
 .experiment-card {
-  flex: 0 0 calc(33.333% - 0.667rem);
-  scroll-snap-align: start;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   padding: var(--space-md);
@@ -621,8 +619,8 @@ section h2::after {
 }
 
 @media (max-width: 1023px) {
-  .experiment-card {
-    flex: 0 0 calc(50% - 0.5rem);
+  .experiments-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -681,8 +679,8 @@ section h2::after {
     height: 36px;
   }
 
-  .experiment-card {
-    flex: 0 0 100%;
+  .experiments-grid {
+    grid-template-columns: 1fr;
   }
 
   .hero-subtitle {

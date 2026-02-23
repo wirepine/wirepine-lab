@@ -8,12 +8,12 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <nav class="nav">
+    <img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Dark</button>
+  </nav>
   <header class="hero">
     <div class="hero-bg"></div>
-    <nav class="nav">
-      <img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo">
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Dark</button>
-    </nav>
     <div class="hero-content">
       <h1 class="hero-title"><span class="wire">Wire</span>pine Lab</h1>
       <p class="hero-subtitle">The AI-pocalypse starts here</p>
@@ -160,6 +160,14 @@
   </div>
 
   <script>
+    // Sticky nav: toggle .scrolled when hero leaves viewport
+    const nav = document.querySelector('.nav');
+    const hero = document.querySelector('.hero');
+    const heroObserver = new IntersectionObserver(([entry]) => {
+      nav.classList.toggle('scrolled', !entry.isIntersecting);
+    }, { threshold: 0 });
+    heroObserver.observe(hero);
+
     // Theme toggle (dark is default)
     const toggle = document.getElementById('theme-toggle');
     const root = document.documentElement;
@@ -187,75 +195,6 @@
       }
     });
 
-    // Carousel: drag-to-scroll + autoplay
-    (function() {
-      const carousel = document.querySelector('.experiments-grid');
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      let autoplayInterval;
-
-      // Drag-to-scroll
-      carousel.addEventListener('mousedown', (e) => {
-        isDown = true;
-        carousel.classList.add('dragging');
-        startX = e.pageX - carousel.offsetLeft;
-        scrollLeft = carousel.scrollLeft;
-      });
-
-      carousel.addEventListener('mouseleave', () => {
-        isDown = false;
-        carousel.classList.remove('dragging');
-        startAutoplay();
-      });
-
-      carousel.addEventListener('mouseup', () => {
-        isDown = false;
-        carousel.classList.remove('dragging');
-      });
-
-      carousel.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - carousel.offsetLeft;
-        const walk = (x - startX) * 2;
-        carousel.scrollLeft = scrollLeft - walk;
-      });
-
-      // Autoplay — 2s between rotations, pause on hover/touch
-      function getCardWidth() {
-        const card = carousel.querySelector('.experiment-card');
-        if (!card) return 0;
-        const gap = parseFloat(getComputedStyle(carousel).gap) || 0;
-        return card.offsetWidth + gap;
-      }
-
-      function autoScroll() {
-        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-        if (carousel.scrollLeft >= maxScroll - 1) {
-          carousel.style.scrollBehavior = 'auto';
-          carousel.scrollLeft = 0;
-          carousel.style.scrollBehavior = '';
-        } else {
-          carousel.scrollBy({ left: getCardWidth(), behavior: 'smooth' });
-        }
-      }
-
-      function startAutoplay() {
-        stopAutoplay();
-        autoplayInterval = setInterval(autoScroll, 2000);
-      }
-
-      function stopAutoplay() {
-        clearInterval(autoplayInterval);
-      }
-
-      carousel.addEventListener('mouseenter', stopAutoplay);
-      carousel.addEventListener('touchstart', stopAutoplay, { passive: true });
-      carousel.addEventListener('touchend', startAutoplay);
-
-      startAutoplay();
-    })();
 
     // Page view counter (displayed in terminal easter egg)
     fetch('https://abacus.jasoncameron.dev/hit/wirepine-lab/pageviews')
