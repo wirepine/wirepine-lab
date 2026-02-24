@@ -579,7 +579,7 @@ section h2::after {
 .footer {
   background: var(--color-teal-deep);
   color: var(--color-cream);
-  padding: var(--space-lg) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   border-top: 2px solid var(--color-gold);
 }
 
@@ -598,9 +598,16 @@ section h2::after {
   gap: var(--space-md);
 }
 
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
 .footer-logo {
-  height: 32px;
+  height: 40px;
   width: auto;
+  display: block;
 }
 
 .footer-links {
@@ -679,7 +686,12 @@ section h2::after {
 
   .footer-content {
     flex-direction: column;
-    text-align: center;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .footer-left {
+    flex-wrap: wrap;
   }
 }
 
