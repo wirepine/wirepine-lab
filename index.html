@@ -33,7 +33,7 @@
 
     <section class="experiments">
       <h2>AI-perbole</h2>
-      <div class="experiments-grid">
+      <div class="experiments-carousel">
         <article class="experiment-card">
           <img src="icon library/semantic-drift.svg" alt="" class="experiment-icon">
           <h3>Semantic Drift</h3>
@@ -94,6 +94,7 @@
 
   <footer class="footer">
     <div class="footer-content">
+      <img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="footer-logo">
       <div class="footer-links">
         <a href="https://wirepine.com">wirepine.com</a>
         <a href="https://newsletter.wirepine.com">newsletter</a>
@@ -160,6 +161,55 @@
   </div>
 
   <script>
+    // Experiments carousel: drag + autoplay
+    const expCarousel = document.querySelector('.experiments-carousel');
+    let expDragging = false;
+    let expStartX, expScrollLeft;
+
+    expCarousel.addEventListener('mousedown', e => {
+      expDragging = true;
+      expCarousel.classList.add('dragging');
+      expStartX = e.pageX - expCarousel.offsetLeft;
+      expScrollLeft = expCarousel.scrollLeft;
+    });
+    expCarousel.addEventListener('mouseleave', () => {
+      expDragging = false;
+      expCarousel.classList.remove('dragging');
+    });
+    expCarousel.addEventListener('mouseup', () => {
+      expDragging = false;
+      expCarousel.classList.remove('dragging');
+    });
+    expCarousel.addEventListener('mousemove', e => {
+      if (!expDragging) return;
+      e.preventDefault();
+      const x = e.pageX - expCarousel.offsetLeft;
+      const walk = (x - expStartX) * 1.5;
+      expCarousel.scrollLeft = expScrollLeft - walk;
+    });
+
+    let expAutoplay;
+    function startExpAutoplay() {
+      expAutoplay = setInterval(() => {
+        const card = expCarousel.querySelector('.experiment-card');
+        const cardWidth = card.offsetWidth + parseFloat(getComputedStyle(expCarousel).gap);
+        const maxScroll = expCarousel.scrollWidth - expCarousel.clientWidth;
+        if (expCarousel.scrollLeft >= maxScroll - 1) {
+          expCarousel.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          expCarousel.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        }
+      }, 2000);
+    }
+    function stopExpAutoplay() { clearInterval(expAutoplay); }
+
+    expCarousel.addEventListener('mouseenter', stopExpAutoplay);
+    expCarousel.addEventListener('mouseleave', startExpAutoplay);
+    expCarousel.addEventListener('touchstart', stopExpAutoplay, { passive: true });
+    expCarousel.addEventListener('touchend', startExpAutoplay, { passive: true });
+
+    startExpAutoplay();
+
     // Sticky nav: toggle .scrolled when hero leaves viewport
     const nav = document.querySelector('.nav');
     const hero = document.querySelector('.hero');
