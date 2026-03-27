@@ -250,6 +250,126 @@
       color: rgba(0,200,150,0.2);
       margin-bottom: 32px;
     }
+
+    /* ── Scrubber ── */
+    .bio-scrubber-wrap {
+      border: 1px solid rgba(0,200,150,0.2);
+      border-radius: 4px;
+      padding: 14px 20px 18px;
+      background: rgba(0,10,8,0.4);
+      margin-bottom: 28px;
+    }
+    .bio-scrubber-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .bio-scrubber-edge {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: rgba(0,200,150,0.25);
+    }
+    .bio-viewing-label {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: #00ffaa;
+      text-transform: uppercase;
+    }
+    .bio-scrubber-input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: rgba(0,200,150,0.2);
+      outline: none;
+      cursor: pointer;
+      border-radius: 1px;
+    }
+    .bio-scrubber-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #00ffaa;
+      box-shadow: 0 0 10px rgba(0,255,170,0.6);
+      cursor: pointer;
+    }
+    .bio-scrubber-input::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #00ffaa;
+      box-shadow: 0 0 10px rgba(0,255,170,0.6);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* ── Key Dates ── */
+    .bio-key-dates {
+      margin-bottom: 28px;
+    }
+    .bio-key-dates-title {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.4);
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,200,150,0.15);
+      margin-bottom: 12px;
+    }
+    .bio-key-dates-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .bio-key-dates-grid { grid-template-columns: 1fr; }
+    }
+    .bio-key-date-card {
+      border-radius: 4px;
+      padding: 14px 12px;
+      background: rgba(0,10,8,0.6);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .bio-key-date-card:hover {
+      box-shadow: 0 0 16px rgba(0,200,150,0.1);
+    }
+    .bio-key-date-type {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.4);
+      margin-bottom: 8px;
+    }
+    .bio-key-date-date {
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .bio-key-date-away {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.45);
+      margin-bottom: 10px;
+    }
+    .bio-key-date-values {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.05em;
+    }
   </style>
 </head>
 <body>
@@ -284,6 +404,16 @@
       <div class="bio-canvas-placeholder" id="placeholder">── Awaiting Input ──</div>
       <canvas id="bio-canvas" width="760" height="220" style="display:none;"></canvas>
     </div>
+  </div>
+
+  <!-- Scrubber -->
+  <div class="bio-scrubber-wrap" id="scrubber-wrap" style="display:none;">
+    <div class="bio-scrubber-meta">
+      <span class="bio-scrubber-edge">─ 90</span>
+      <span class="bio-viewing-label" id="viewing-label">◉ Today</span>
+      <span class="bio-scrubber-edge">+90 ─</span>
+    </div>
+    <input type="range" id="time-scrubber" class="bio-scrubber-input" min="-90" max="90" value="0" step="1">
   </div>
 
   <!-- Legend -->
@@ -332,6 +462,12 @@
     ⚠ Multi-Critical Alignment Detected ⚠
   </div>
 
+  <!-- Key dates panel -->
+  <div class="bio-key-dates" id="key-dates" style="display:none;">
+    <div class="bio-key-dates-title">◈ Key Dates · 90-Day Scan</div>
+    <div class="bio-key-dates-grid" id="key-dates-grid"></div>
+  </div>
+
   <div class="bio-footnote">For entertainment purposes only · Pseudoscience since 1897</div>
 
   <a href="index.html" class="bio-back">← Back to Wirepine Lab</a>
@@ -376,13 +512,16 @@
     }
   });
 
-  // ── Biorhythm logic ──
+  // ── Globals ──
+  let gBirthDays = null;
+
   const CYCLES = [
     { key: 'physical',     cycleDays: 23, color: '#ff4d4d', glow: '#ff000088' },
     { key: 'emotional',    cycleDays: 28, color: '#ffcc00', glow: '#ffcc0088' },
     { key: 'intellectual', cycleDays: 33, color: '#00ccff', glow: '#00ccff88' },
   ];
 
+  // ── Helpers ──
   function daysSinceBirth(dateStr) {
     const birth = new Date(dateStr);
     const today = new Date();
@@ -407,13 +546,29 @@
     return val > 0 ? '#00ffaa' : 'rgba(0,200,150,0.4)';
   }
 
-  function drawChart(totalDays) {
+  function offsetToDate(offset) {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return d;
+  }
+
+  function formatDateFull(date) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function formatDateShort(date) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+  }
+
+  // ── Chart ──
+  function drawChart(viewingDays, offset) {
     const canvas = document.getElementById('bio-canvas');
     const ctx = canvas.getContext('2d');
     const W = canvas.width;
     const H = canvas.height;
     const SPAN = 28;
     const midY = H / 2;
+    const centerX = (14 / SPAN) * W;
 
     ctx.clearRect(0, 0, W, H);
 
@@ -438,13 +593,19 @@
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
     }
 
-    // Day labels
+    // Day labels — center shows the viewed date, others stay relative
     ctx.font = "10px 'Courier New', monospace";
     ctx.fillStyle = 'rgba(0,200,150,0.4)';
     ctx.textAlign = 'center';
     for (let d = -14; d <= 14; d += 7) {
       const x = ((d + 14) / SPAN) * W;
-      ctx.fillText(d === 0 ? 'TODAY' : (d > 0 ? `+${d}` : `${d}`), x, H - 6);
+      let label;
+      if (d === 0) {
+        label = offset === 0 ? 'TODAY' : formatDateShort(offsetToDate(offset));
+      } else {
+        label = d > 0 ? `+${d}` : `${d}`;
+      }
+      ctx.fillText(label, x, H - 6);
     }
 
     // Zero line (dashed)
@@ -453,11 +614,23 @@
     ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
     ctx.setLineDash([]);
 
-    // Today line
-    const todayX = (14 / SPAN) * W;
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    // Center line (viewed date)
+    ctx.strokeStyle = offset === 0 ? 'rgba(255,255,255,0.25)' : 'rgba(0,255,170,0.35)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(todayX, 0); ctx.lineTo(todayX, H - 16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, H - 16); ctx.stroke();
+
+    // Today marker when scrubbed (if today is within the ±13 day window)
+    if (offset !== 0 && Math.abs(offset) < 14) {
+      const todayX = ((14 - offset) / SPAN) * W;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.setLineDash([2, 5]);
+      ctx.beginPath(); ctx.moveTo(todayX, 0); ctx.lineTo(todayX, H - 16); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "9px 'Courier New', monospace";
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.textAlign = 'center';
+      ctx.fillText('NOW', todayX, H - 6);
+    }
 
     // Sine waves
     CYCLES.forEach(({ cycleDays, color, glow }) => {
@@ -468,7 +641,7 @@
       ctx.beginPath();
       for (let px = 0; px < W; px++) {
         const dayOffset = (px / W) * SPAN - 14;
-        const val = Math.sin((2 * Math.PI * (totalDays + dayOffset)) / cycleDays);
+        const val = Math.sin((2 * Math.PI * (viewingDays + dayOffset)) / cycleDays);
         const y = midY - val * (midY * 0.8);
         px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
       }
@@ -476,42 +649,121 @@
       ctx.shadowBlur = 0;
     });
 
-    // Today dots
+    // Center dots (viewed date)
     CYCLES.forEach(({ cycleDays, color, glow }) => {
-      const val = Math.sin((2 * Math.PI * totalDays) / cycleDays);
+      const val = Math.sin((2 * Math.PI * viewingDays) / cycleDays);
       const y = midY - val * (midY * 0.8);
       ctx.shadowColor = glow;
       ctx.shadowBlur = 16;
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(todayX, y, 5, 0, Math.PI * 2);
+      ctx.arc(centerX, y, 5, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
     });
   }
 
-  function updateCards(totalDays) {
+  // ── Cards ──
+  function updateCards(viewingDays) {
     let criticalCount = 0;
-
     CYCLES.forEach(({ key, cycleDays }) => {
-      const val = getBioValue(totalDays, cycleDays);
+      const val = getBioValue(viewingDays, cycleDays);
       const pct = toPercent(val);
       const card = document.getElementById(`card-${key}`);
-      const valueEl = card.querySelector('.bio-card-value');
+      card.querySelector('.bio-card-value').textContent = `${pct}%`;
       const phaseEl = card.querySelector('.bio-card-phase');
-      const barEl   = card.querySelector('.bio-card-bar');
-
-      valueEl.textContent = `${pct}%`;
       phaseEl.textContent = phaseLabel(val);
       phaseEl.style.color = phaseColor(val);
-      barEl.style.width = `${pct}%`;
+      card.querySelector('.bio-card-bar').style.width = `${pct}%`;
       card.classList.add('active');
-
       if (Math.abs(val) < 0.15) criticalCount++;
     });
+    document.getElementById('critical-warning').classList.toggle('visible', criticalCount >= 2);
+  }
 
-    const warning = document.getElementById('critical-warning');
-    warning.classList.toggle('visible', criticalCount >= 2);
+  // ── Render (chart + cards + viewing label) ──
+  function render(offset) {
+    if (gBirthDays === null) return;
+    const viewingDays = gBirthDays + offset;
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('bio-canvas').style.display = 'block';
+
+    drawChart(viewingDays, offset);
+    updateCards(viewingDays);
+
+    const label = document.getElementById('viewing-label');
+    if (offset === 0) {
+      label.textContent = '◉ Today';
+    } else {
+      const sign = offset > 0 ? `+${offset}` : `${offset}`;
+      label.textContent = `◉ ${formatDateFull(offsetToDate(offset))}  (${sign}d)`;
+    }
+  }
+
+  // ── Key dates ──
+  function computeKeyDates(birthDays) {
+    let peakDay = 0, peakScore = -Infinity;
+    let lowDay  = 0, lowScore  =  Infinity;
+    let critDay = 0, critScore =  Infinity;
+
+    for (let d = 0; d <= 90; d++) {
+      const days = birthDays + d;
+      const p = Math.sin((2 * Math.PI * days) / 23);
+      const e = Math.sin((2 * Math.PI * days) / 28);
+      const i = Math.sin((2 * Math.PI * days) / 33);
+      const sum    = p + e + i;
+      const absSum = Math.abs(p) + Math.abs(e) + Math.abs(i);
+      if (sum    > peakScore) { peakScore = sum;    peakDay = d; }
+      if (sum    < lowScore)  { lowScore  = sum;    lowDay  = d; }
+      if (absSum < critScore) { critScore = absSum; critDay = d; }
+    }
+
+    return [
+      { label: 'Triple Peak',     icon: '▲', offset: peakDay, accentColor: '#00ffaa',          borderColor: 'rgba(0,255,170,0.3)' },
+      { label: 'Triple Low',      icon: '▼', offset: lowDay,  accentColor: 'rgba(0,200,150,0.6)', borderColor: 'rgba(0,200,150,0.2)' },
+      { label: 'Triple Critical', icon: '⚠', offset: critDay, accentColor: '#ffcc00',           borderColor: 'rgba(255,200,0,0.35)' },
+    ];
+  }
+
+  function renderKeyDates(birthDays) {
+    const entries = computeKeyDates(birthDays);
+    const grid = document.getElementById('key-dates-grid');
+    grid.innerHTML = '';
+
+    entries.forEach(({ label, icon, offset, accentColor, borderColor }) => {
+      const days = birthDays + offset;
+      const p = toPercent(Math.sin((2 * Math.PI * days) / 23));
+      const e = toPercent(Math.sin((2 * Math.PI * days) / 28));
+      const i = toPercent(Math.sin((2 * Math.PI * days) / 33));
+      const date = offsetToDate(offset);
+      const awayText = offset === 0 ? 'Today'
+        : offset === 1 ? 'Tomorrow'
+        : `In ${offset} days`;
+
+      const card = document.createElement('div');
+      card.className = 'bio-key-date-card';
+      card.style.border = `1px solid ${borderColor}`;
+      card.innerHTML = `
+        <div class="bio-key-date-type">${icon} ${label}</div>
+        <div class="bio-key-date-date" style="color:${accentColor};text-shadow:0 0 16px ${accentColor}66;">${formatDateFull(date)}</div>
+        <div class="bio-key-date-away">${awayText}</div>
+        <div class="bio-key-date-values">
+          <span style="color:#ff4d4d">${p}%</span>
+          <span style="color:rgba(0,200,150,0.25)">·</span>
+          <span style="color:#ffcc00">${e}%</span>
+          <span style="color:rgba(0,200,150,0.25)">·</span>
+          <span style="color:#00ccff">${i}%</span>
+        </div>`;
+      card.addEventListener('click', () => {
+        const slider = document.getElementById('time-scrubber');
+        slider.value = offset;
+        render(offset);
+      });
+      grid.appendChild(card);
+    });
+
+    document.getElementById('key-dates').style.display = 'block';
   }
 
   // ── Wire it up ──
@@ -519,15 +771,19 @@
     const val = this.value;
     if (!val) return;
 
-    const days = daysSinceBirth(val);
+    gBirthDays = daysSinceBirth(val);
+    document.getElementById('days-elapsed').textContent = `${gBirthDays.toLocaleString()} days elapsed`;
 
-    document.getElementById('days-elapsed').textContent = `${days.toLocaleString()} days elapsed`;
-    document.getElementById('placeholder').style.display = 'none';
-    const canvas = document.getElementById('bio-canvas');
-    canvas.style.display = 'block';
+    // Reset slider to today
+    document.getElementById('time-scrubber').value = 0;
+    document.getElementById('scrubber-wrap').style.display = 'block';
 
-    drawChart(days);
-    updateCards(days);
+    render(0);
+    renderKeyDates(gBirthDays);
+  });
+
+  document.getElementById('time-scrubber').addEventListener('input', function () {
+    render(parseInt(this.value, 10));
   });
 </script>
 
