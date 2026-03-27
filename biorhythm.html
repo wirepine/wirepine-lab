@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biorhythm Analyzer — Wirepine Lab</title>
+  <link rel="icon" type="image/png" href="Wirepine Lab Transparent v1.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Biorhythm page styles ── */
+    .bio-hero {
+      padding: 80px 24px 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border, rgba(0,200,150,0.2));
+    }
+    .bio-hero .eyebrow {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--accent, #00cc88);
+      opacity: 0.6;
+      margin-bottom: 12px;
+    }
+    .bio-hero h1 {
+      font-family: 'Courier New', monospace;
+      font-size: clamp(28px, 6vw, 52px);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 0 0 8px;
+      color: var(--accent, #00cc88);
+      text-shadow: 0 0 30px rgba(0,255,170,0.3);
+    }
+    .bio-hero p {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--text-muted, rgba(0,200,150,0.5));
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .bio-container {
+      max-width: 760px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+
+    /* Input panel */
+    .bio-input-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: rgba(0,30,20,0.5);
+      border: 1px solid rgba(0,200,150,0.25);
+      border-radius: 4px;
+      padding: 20px 32px;
+      margin-bottom: 32px;
+    }
+    .bio-input-panel label {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.6);
+    }
+    .bio-input-panel input[type="date"] {
+      background: rgba(0,20,15,0.8);
+      border: 1px solid rgba(0,200,150,0.4);
+      color: #00ffaa;
+      padding: 8px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+    }
+    .bio-input-panel input[type="date"]:focus {
+      border-color: rgba(0,200,150,0.8);
+      box-shadow: 0 0 12px rgba(0,200,150,0.2);
+    }
+    .bio-days-elapsed {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: rgba(0,200,150,0.45);
+      text-transform: uppercase;
+    }
+
+    /* Chart */
+    .bio-chart-wrapper {
+      border: 1px solid rgba(0,200,150,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      background: #050e0e;
+      box-shadow: 0 0 40px rgba(0,200,100,0.06);
+    }
+    .bio-chart-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(0,200,150,0.15);
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: rgba(0,200,150,0.4);
+      text-transform: uppercase;
+    }
+    #bio-canvas {
+      width: 100%;
+      display: block;
+    }
+    .bio-canvas-placeholder {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.2);
+    }
+
+    /* Legend */
+    .bio-legend {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .bio-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bio-legend-line {
+      width: 28px;
+      height: 2px;
+    }
+    .bio-legend-label {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.6);
+    }
+
+    /* Reading cards */
+    .bio-readings {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 480px) {
+      .bio-readings { grid-template-columns: 1fr; }
+    }
+    .bio-card {
+      border-radius: 4px;
+      padding: 16px 12px;
+      background: rgba(0,10,8,0.6);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      opacity: 0.35;
+      transition: opacity 0.4s;
+    }
+    .bio-card.active { opacity: 1; }
+    .bio-card-label {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.4);
+      margin-bottom: 8px;
+    }
+    .bio-card-value {
+      font-family: 'Courier New', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .bio-card-phase {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .bio-card-desc {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      color: rgba(0,200,150,0.3);
+      letter-spacing: 0.1em;
+    }
+    .bio-card-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      transition: width 0.5s ease;
+    }
+
+    /* Critical warning */
+    .bio-critical {
+      display: none;
+      border: 1px solid rgba(255,200,0,0.4);
+      border-radius: 4px;
+      padding: 12px 24px;
+      margin-bottom: 24px;
+      background: rgba(30,20,0,0.5);
+      color: #ffcc00;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255,200,0,0.08);
+    }
+    .bio-critical.visible { display: block; }
+
+    /* Back link */
+    .bio-back {
+      display: block;
+      text-align: center;
+      margin: 48px 0 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.5);
+      text-decoration: none;
+    }
+    .bio-back:hover { color: #00ffaa; }
+
+    /* Footer note */
+    .bio-footnote {
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0,200,150,0.2);
+      margin-bottom: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo"></a>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Light</button>
+</nav>
+
+<div class="bio-hero">
+  <div class="eyebrow">◈ Wirepine Lab · Experiment ◈</div>
+  <h1>Biorhythm<br>Analyzer</h1>
+  <p>Pseudoscience · Est. 1897</p>
+</div>
+
+<div class="bio-container">
+
+  <!-- Input -->
+  <div class="bio-input-panel">
+    <label for="birthdate">Date of Birth</label>
+    <input type="date" id="birthdate" />
+    <div class="bio-days-elapsed" id="days-elapsed"></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="bio-chart-wrapper">
+    <div class="bio-chart-header">
+      <span>◉ Oscilloscope Display</span>
+      <span>±14 Day Window</span>
+    </div>
+    <div id="canvas-container">
+      <div class="bio-canvas-placeholder" id="placeholder">── Awaiting Input ──</div>
+      <canvas id="bio-canvas" width="760" height="220" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="bio-legend">
+    <div class="bio-legend-item">
+      <div class="bio-legend-line" style="background:#ff4d4d; box-shadow:0 0 6px #ff4d4d;"></div>
+      <span class="bio-legend-label">Physical</span>
+    </div>
+    <div class="bio-legend-item">
+      <div class="bio-legend-line" style="background:#ffcc00; box-shadow:0 0 6px #ffcc00;"></div>
+      <span class="bio-legend-label">Emotional</span>
+    </div>
+    <div class="bio-legend-item">
+      <div class="bio-legend-line" style="background:#00ccff; box-shadow:0 0 6px #00ccff;"></div>
+      <span class="bio-legend-label">Intellectual</span>
+    </div>
+  </div>
+
+  <!-- Reading cards -->
+  <div class="bio-readings">
+    <div class="bio-card" id="card-physical" style="border:1px solid #ff4d4d44;">
+      <div class="bio-card-label">Physical</div>
+      <div class="bio-card-value" style="color:#ff4d4d; text-shadow:0 0 20px #ff000088;">--%</div>
+      <div class="bio-card-phase" style="color:rgba(0,200,150,0.4);">──</div>
+      <div class="bio-card-desc">Strength · Energy · Coordination</div>
+      <div class="bio-card-bar" style="background:#ff4d4d; box-shadow:0 0 8px #ff4d4d; width:50%;"></div>
+    </div>
+    <div class="bio-card" id="card-emotional" style="border:1px solid #ffcc0044;">
+      <div class="bio-card-label">Emotional</div>
+      <div class="bio-card-value" style="color:#ffcc00; text-shadow:0 0 20px #ffcc0088;">--%</div>
+      <div class="bio-card-phase" style="color:rgba(0,200,150,0.4);">──</div>
+      <div class="bio-card-desc">Mood · Sensitivity · Creativity</div>
+      <div class="bio-card-bar" style="background:#ffcc00; box-shadow:0 0 8px #ffcc00; width:50%;"></div>
+    </div>
+    <div class="bio-card" id="card-intellectual" style="border:1px solid #00ccff44;">
+      <div class="bio-card-label">Intellectual</div>
+      <div class="bio-card-value" style="color:#00ccff; text-shadow:0 0 20px #00ccff88;">--%</div>
+      <div class="bio-card-phase" style="color:rgba(0,200,150,0.4);">──</div>
+      <div class="bio-card-desc">Memory · Alertness · Logic</div>
+      <div class="bio-card-bar" style="background:#00ccff; box-shadow:0 0 8px #00ccff; width:50%;"></div>
+    </div>
+  </div>
+
+  <!-- Critical warning -->
+  <div class="bio-critical" id="critical-warning">
+    ⚠ Multi-Critical Alignment Detected ⚠
+  </div>
+
+  <div class="bio-footnote">For entertainment purposes only · Pseudoscience since 1897</div>
+
+  <a href="index.html" class="bio-back">← Back to Wirepine Lab</a>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-left">
+      <a href="https://wirepine.com"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="footer-logo"></a>
+      <div class="footer-links">
+        <a href="https://wirepine.com">wirepine.com</a>
+        <a href="https://newsletter.wirepine.com">newsletter</a>
+      </div>
+    </div>
+    <p class="footer-copyright">&copy; 2026 Wirepine. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // ── Theme toggle ──
+  const toggle = document.getElementById('theme-toggle');
+  const root = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    root.removeAttribute('data-theme');
+    toggle.textContent = 'Dark';
+  } else {
+    root.setAttribute('data-theme', 'dark');
+    toggle.textContent = 'Light';
+  }
+  toggle.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      root.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+      toggle.textContent = 'Dark';
+    } else {
+      root.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+      toggle.textContent = 'Light';
+    }
+  });
+
+  // ── Biorhythm logic ──
+  const CYCLES = [
+    { key: 'physical',     cycleDays: 23, color: '#ff4d4d', glow: '#ff000088' },
+    { key: 'emotional',    cycleDays: 28, color: '#ffcc00', glow: '#ffcc0088' },
+    { key: 'intellectual', cycleDays: 33, color: '#00ccff', glow: '#00ccff88' },
+  ];
+
+  function daysSinceBirth(dateStr) {
+    const birth = new Date(dateStr);
+    const today = new Date();
+    return Math.floor((today - birth) / 86400000);
+  }
+
+  function getBioValue(days, cycleDays) {
+    return Math.sin((2 * Math.PI * days) / cycleDays);
+  }
+
+  function toPercent(val) {
+    return Math.round(((val + 1) / 2) * 100);
+  }
+
+  function phaseLabel(val) {
+    if (Math.abs(val) < 0.1) return '⚠ Critical';
+    return val > 0 ? '▲ High' : '▼ Low';
+  }
+
+  function phaseColor(val) {
+    if (Math.abs(val) < 0.1) return '#ffcc00';
+    return val > 0 ? '#00ffaa' : 'rgba(0,200,150,0.4)';
+  }
+
+  function drawChart(totalDays) {
+    const canvas = document.getElementById('bio-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    const SPAN = 28;
+    const midY = H / 2;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#050e0e';
+    ctx.fillRect(0, 0, W, H);
+
+    // Scanlines
+    for (let y = 0; y < H; y += 4) {
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.fillRect(0, y, W, 2);
+    }
+
+    // Grid
+    ctx.strokeStyle = 'rgba(0,200,150,0.12)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      ctx.beginPath(); ctx.moveTo(0, (H / 4) * i); ctx.lineTo(W, (H / 4) * i); ctx.stroke();
+    }
+    for (let d = -14; d <= 14; d += 7) {
+      const x = ((d + 14) / SPAN) * W;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+
+    // Day labels
+    ctx.font = "10px 'Courier New', monospace";
+    ctx.fillStyle = 'rgba(0,200,150,0.4)';
+    ctx.textAlign = 'center';
+    for (let d = -14; d <= 14; d += 7) {
+      const x = ((d + 14) / SPAN) * W;
+      ctx.fillText(d === 0 ? 'TODAY' : (d > 0 ? `+${d}` : `${d}`), x, H - 6);
+    }
+
+    // Zero line (dashed)
+    ctx.strokeStyle = 'rgba(0,200,150,0.25)';
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Today line
+    const todayX = (14 / SPAN) * W;
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(todayX, 0); ctx.lineTo(todayX, H - 16); ctx.stroke();
+
+    // Sine waves
+    CYCLES.forEach(({ cycleDays, color, glow }) => {
+      ctx.shadowColor = glow;
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let px = 0; px < W; px++) {
+        const dayOffset = (px / W) * SPAN - 14;
+        const val = Math.sin((2 * Math.PI * (totalDays + dayOffset)) / cycleDays);
+        const y = midY - val * (midY * 0.8);
+        px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
+
+    // Today dots
+    CYCLES.forEach(({ cycleDays, color, glow }) => {
+      const val = Math.sin((2 * Math.PI * totalDays) / cycleDays);
+      const y = midY - val * (midY * 0.8);
+      ctx.shadowColor = glow;
+      ctx.shadowBlur = 16;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(todayX, y, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+  }
+
+  function updateCards(totalDays) {
+    let criticalCount = 0;
+
+    CYCLES.forEach(({ key, cycleDays }) => {
+      const val = getBioValue(totalDays, cycleDays);
+      const pct = toPercent(val);
+      const card = document.getElementById(`card-${key}`);
+      const valueEl = card.querySelector('.bio-card-value');
+      const phaseEl = card.querySelector('.bio-card-phase');
+      const barEl   = card.querySelector('.bio-card-bar');
+
+      valueEl.textContent = `${pct}%`;
+      phaseEl.textContent = phaseLabel(val);
+      phaseEl.style.color = phaseColor(val);
+      barEl.style.width = `${pct}%`;
+      card.classList.add('active');
+
+      if (Math.abs(val) < 0.15) criticalCount++;
+    });
+
+    const warning = document.getElementById('critical-warning');
+    warning.classList.toggle('visible', criticalCount >= 2);
+  }
+
+  // ── Wire it up ──
+  document.getElementById('birthdate').addEventListener('change', function () {
+    const val = this.value;
+    if (!val) return;
+
+    const days = daysSinceBirth(val);
+
+    document.getElementById('days-elapsed').textContent = `${days.toLocaleString()} days elapsed`;
+    document.getElementById('placeholder').style.display = 'none';
+    const canvas = document.getElementById('bio-canvas');
+    canvas.style.display = 'block';
+
+    drawChart(days);
+    updateCards(days);
+  });
+</script>
+
+</body>
+</html>
