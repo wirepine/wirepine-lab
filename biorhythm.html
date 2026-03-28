@@ -393,6 +393,10 @@
       letter-spacing: 0.05em;
     }
     /* ── Light mode overrides ── */
+    html:not([data-theme="dark"]) .nav-logo {
+      filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+    }
+
     html:not([data-theme="dark"]) .bio-hero h1 {
       color: var(--color-teal-deep);
       text-shadow: none;
