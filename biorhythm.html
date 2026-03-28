@@ -385,6 +385,145 @@
       font-size: 9px;
       letter-spacing: 0.05em;
     }
+    /* ── Light mode overrides ── */
+    html:not([data-theme="dark"]) .bio-hero h1 {
+      color: var(--color-teal-deep);
+      text-shadow: none;
+    }
+    html:not([data-theme="dark"]) .bio-hero p,
+    html:not([data-theme="dark"]) .bio-hero .eyebrow {
+      color: var(--color-text-muted);
+      opacity: 1;
+    }
+    html:not([data-theme="dark"]) .bio-hero {
+      border-bottom-color: var(--color-border);
+    }
+
+    html:not([data-theme="dark"]) .bio-input-panel {
+      background: var(--color-surface);
+      border-color: var(--color-border);
+    }
+    html:not([data-theme="dark"]) .bio-input-panel label {
+      color: var(--color-text-muted);
+    }
+    html:not([data-theme="dark"]) .bio-input-panel input[type="date"] {
+      background: var(--color-cream);
+      border-color: var(--color-border);
+      color: var(--color-teal-deep);
+    }
+    html:not([data-theme="dark"]) .bio-input-panel input[type="date"]:focus {
+      border-color: var(--color-teal);
+      box-shadow: 0 0 8px rgba(45,107,101,0.15);
+    }
+    html:not([data-theme="dark"]) .bio-days-elapsed {
+      color: var(--color-text-muted);
+    }
+
+    html:not([data-theme="dark"]) .bio-chart-wrapper {
+      border-color: var(--color-border);
+      box-shadow: none;
+    }
+    html:not([data-theme="dark"]) .bio-chart-header {
+      color: var(--color-text-muted);
+      border-bottom-color: var(--color-border);
+      background: var(--color-surface);
+    }
+    html:not([data-theme="dark"]) .bio-canvas-placeholder {
+      color: var(--color-text-muted);
+    }
+
+    html:not([data-theme="dark"]) .bio-legend-label {
+      color: var(--color-text-muted);
+    }
+
+    html:not([data-theme="dark"]) .bio-card {
+      background: var(--color-surface);
+    }
+    html:not([data-theme="dark"]) .bio-card-label {
+      color: var(--color-text-muted);
+    }
+    html:not([data-theme="dark"]) .bio-card-value {
+      text-shadow: none !important;
+    }
+    /* Darken neon yellow + cyan so they're legible on cream */
+    html:not([data-theme="dark"]) #card-emotional .bio-card-value {
+      color: #b38a00 !important;
+    }
+    html:not([data-theme="dark"]) #card-intellectual .bio-card-value {
+      color: #007a99 !important;
+    }
+    html:not([data-theme="dark"]) .bio-card-desc {
+      color: var(--color-text-muted);
+    }
+
+    html:not([data-theme="dark"]) .bio-scrubber-wrap {
+      background: var(--color-surface);
+      border-color: var(--color-border);
+    }
+    html:not([data-theme="dark"]) .bio-scrubber-edge {
+      color: var(--color-text-muted);
+    }
+    html:not([data-theme="dark"]) .bio-viewing-label {
+      color: var(--color-teal-deep);
+    }
+    html:not([data-theme="dark"]) .bio-scrubber-input {
+      background: var(--color-border);
+    }
+    html:not([data-theme="dark"]) .bio-scrubber-input::-webkit-slider-thumb {
+      background: var(--color-teal);
+      box-shadow: 0 0 8px rgba(45,107,101,0.35);
+    }
+    html:not([data-theme="dark"]) .bio-scrubber-input::-moz-range-thumb {
+      background: var(--color-teal);
+      box-shadow: 0 0 8px rgba(45,107,101,0.35);
+    }
+
+    html:not([data-theme="dark"]) .bio-key-dates-title {
+      color: var(--color-text-muted);
+      border-bottom-color: var(--color-border);
+    }
+    html:not([data-theme="dark"]) .bio-key-date-card {
+      background: var(--color-surface);
+    }
+    html:not([data-theme="dark"]) .bio-key-date-type {
+      color: var(--color-text-muted);
+    }
+    html:not([data-theme="dark"]) .bio-key-date-date {
+      color: var(--color-teal-deep) !important;
+      text-shadow: none !important;
+    }
+    html:not([data-theme="dark"]) .bio-key-date-away {
+      color: var(--color-text-muted);
+    }
+    /* Darken neon yellow + cyan in key-date value rows */
+    html:not([data-theme="dark"]) .bio-key-date-values span[style*="#ffcc00"] {
+      color: #b38a00 !important;
+    }
+    html:not([data-theme="dark"]) .bio-key-date-values span[style*="#00ccff"] {
+      color: #007a99 !important;
+    }
+
+    html:not([data-theme="dark"]) .bio-critical {
+      background: rgba(255,200,0,0.08);
+    }
+
+    html:not([data-theme="dark"]) .bio-explainer {
+      border-top-color: var(--color-border);
+    }
+    html:not([data-theme="dark"]) .bio-explainer p {
+      color: var(--color-text);
+    }
+
+    html:not([data-theme="dark"]) .bio-footnote {
+      color: var(--color-text-muted);
+      opacity: 0.6;
+    }
+    html:not([data-theme="dark"]) .bio-back {
+      color: var(--color-teal);
+    }
+    html:not([data-theme="dark"]) .bio-back:hover {
+      color: var(--color-teal-light);
+    }
   </style>
 </head>
 <body>
