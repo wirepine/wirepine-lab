@@ -536,7 +536,7 @@
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav scrolled" id="main-nav">
   <a href="index.html"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo"></a>
   <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Light</button>
 </nav>
@@ -682,6 +682,13 @@
       toggle.textContent = 'Light';
     }
   });
+
+  // ── Sticky nav ──
+  const nav = document.getElementById('main-nav');
+  const bioHero = document.querySelector('.bio-hero');
+  new IntersectionObserver(([entry]) => {
+    nav.classList.toggle('scrolled', !entry.isIntersecting);
+  }, { threshold: 0 }).observe(bioHero);
 
   // ── Globals ──
   let gBirthDays = null;
