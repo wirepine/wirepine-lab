@@ -248,10 +248,10 @@
     }
     .bio-explainer p {
       font-family: Georgia, serif;
-      font-size: 14px;
-      line-height: 1.8;
-      color: rgba(0,200,150,0.55);
-      margin: 0 0 16px;
+      font-size: 1.5rem;
+      line-height: 1.7;
+      color: var(--color-text, #f5f5f0);
+      margin: 0 0 var(--space-md, 2rem);
     }
     .bio-explainer p:last-child { margin-bottom: 0; }
 
@@ -509,9 +509,6 @@
 
     html:not([data-theme="dark"]) .bio-explainer {
       border-top-color: var(--color-border);
-    }
-    html:not([data-theme="dark"]) .bio-explainer p {
-      color: var(--color-text);
     }
 
     html:not([data-theme="dark"]) .bio-footnote {
