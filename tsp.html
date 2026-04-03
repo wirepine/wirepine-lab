@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traveling Salesman — Wirepine Lab</title>
+  <link rel="icon" type="image/png" href="Wirepine Lab Transparent v1.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .tsp-page-header {
+      padding-top: calc(60px + var(--space-lg));
+      padding-bottom: var(--space-md);
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-left: var(--space-md);
+      padding-right: var(--space-md);
+    }
+
+    .tsp-back {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-accent);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: var(--space-sm);
+      transition: opacity 0.2s;
+    }
+
+    .tsp-back:hover { opacity: 0.7; }
+
+    .tsp-page-title {
+      font-family: var(--font-sans);
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: var(--space-xs);
+    }
+
+    .tsp-page-desc {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+      max-width: 520px;
+      margin-top: 0.75rem;
+    }
+
+    .tsp-section {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: var(--space-md) var(--space-md) var(--space-xl);
+    }
+
+    /* TSP app styles */
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+
+    .btn-row button {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background: var(--color-surface);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-row button:hover { opacity: 0.8; }
+
+    .btn-row button.active {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      border-color: var(--color-accent);
+    }
+
+    #city-canvas {
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      cursor: crosshair;
+      display: block;
+      width: 100%;
+      background: var(--color-surface);
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 1rem 0;
+    }
+
+    .stat {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: var(--font-sans);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .stat-lbl {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    #info {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--color-text-muted);
+      min-height: 36px;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    #info strong { color: var(--color-text); }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .legend span { display: flex; align-items: center; gap: 5px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .line-s { width: 18px; height: 3px; display: inline-block; }
+
+    #math-panel { margin-top: 1.5rem; }
+
+    #math-panel h2 {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text);
+      margin-bottom: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; font-family: var(--font-sans); }
+
+    th {
+      text-align: left;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    td {
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    tr.hl td {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      font-weight: 500;
+    }
+
+    .bar-bg { background: var(--color-border); border-radius: 2px; height: 8px; }
+    .bar-fill { background: var(--color-accent); height: 8px; border-radius: 2px; }
+
+    .why {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-top: 1rem;
+      line-height: 1.7;
+    }
+
+    .why strong { color: var(--color-text); }
+    .why em { color: var(--color-accent); font-style: normal; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo"></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Dark</button>
+  </nav>
+
+  <main>
+    <div class="tsp-page-header">
+      <a href="index.html" class="tsp-back">← Back to Lab</a>
+      <h1 class="tsp-page-title">Traveling Salesman</h1>
+      <p class="tsp-page-desc">Place cities on the canvas, then watch brute force or nearest-neighbor solve the route in real time.</p>
+    </div>
+
+    <div class="tsp-section">
+      <div class="btn-row">
+        <button onclick="addRandom(1)">+ city</button>
+        <button onclick="addRandom(3)">+ 3 cities</button>
+        <button onclick="resetAll()">reset</button>
+        <button id="bf-btn" onclick="setMode('brute')" class="active">brute force</button>
+        <button id="nn-btn" onclick="setMode('nn')">nearest neighbor</button>
+        <button onclick="runSolve()">&#9654; solve</button>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><div class="stat-val" id="s-n">4</div><div class="stat-lbl">cities</div></div>
+        <div class="stat"><div class="stat-val" id="s-routes">3</div><div class="stat-lbl">possible routes</div></div>
+        <div class="stat"><div class="stat-val" id="s-checked">—</div><div class="stat-lbl">routes checked</div></div>
+        <div class="stat"><div class="stat-val" id="s-dist">—</div><div class="stat-lbl">best distance</div></div>
+      </div>
+
+      <div id="info">Add cities by clicking the canvas or using the buttons, then hit ▶ solve.</div>
+
+      <div class="legend">
+        <span><span class="dot" style="background:#E24B4A"></span>city</span>
+        <span><span class="dot" style="background:#1D9E75"></span>start city</span>
+        <span><span class="line-s" style="background:rgba(100,100,100,0.4)"></span>trying this route</span>
+        <span><span class="line-s" style="background:#E24B4A; opacity:.7"></span>best so far</span>
+        <span><span class="line-s" style="background:#1D9E75"></span>final best route</span>
+      </div>
+
+      <canvas id="city-canvas" height="300"></canvas>
+
+      <div id="math-panel">
+        <h2>why does every new city make it so much harder?</h2>
+        <table>
+          <thead><tr>
+            <th>cities</th><th>calculation</th><th>routes to check</th><th>scale</th>
+          </tr></thead>
+          <tbody id="math-body"></tbody>
+        </table>
+        <div class="why" id="why-box">
+          With <strong id="wb-n">4</strong> cities, you have <strong id="wb-calc">3 × 2 × 1 = 3</strong> routes.<br>
+          Add one more city and there are <strong id="wb-mult">4</strong> places to slot it into the route — so the total multiplies by <strong id="wb-mult2">4</strong>.<br>
+          That's <em>factorial</em> growth: each new city <em>multiplies</em> the problem, not adds to it.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="https://wirepine.com"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="footer-logo"></a>
+        <div class="footer-links">
+          <a href="https://wirepine.com">wirepine.com</a>
+          <a href="https://newsletter.wirepine.com">newsletter</a>
+          <a href="index.html">← back to lab</a>
+        </div>
+      </div>
+      <p class="footer-copyright">&copy; 2026 Wirepine. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ── Theme toggle ──────────────────────────────
+    const toggle = document.getElementById('theme-toggle');
+    const root   = document.documentElement;
+    const nav    = document.querySelector('.nav');
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      root.removeAttribute('data-theme');
+      toggle.textContent = 'Dark';
+    } else {
+      root.setAttribute('data-theme', 'dark');
+      toggle.textContent = 'Light';
+    }
+
+    toggle.addEventListener('click', () => {
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        root.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        toggle.textContent = 'Dark';
+      } else {
+        root.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = 'Light';
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // ── TSP ──────────────────────────────────────
+    const canvas = document.getElementById('city-canvas');
+    const ctx = canvas.getContext('2d');
+    let cities = [], bestRoute = [], tryingRoute = [], bestSoFar = [];
+    let mode = 'brute', solving = false, animTimeout = null;
+
+    function cw() { return canvas.offsetWidth || 600; }
+    function ch() { return 300; }
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = cw() * dpr;
+      canvas.height = ch() * dpr;
+      ctx.scale(dpr, dpr);
+      draw();
+    }
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 80);
+
+    canvas.addEventListener('click', e => {
+      if (solving) return;
+      const r = canvas.getBoundingClientRect();
+      cities.push({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / ch() });
+      bestRoute = []; tryingRoute = []; bestSoFar = [];
+      refresh();
+    });
+
+    function addRandom(n) {
+      if (solving) return;
+      for (let i = 0; i < n; i++)
+        cities.push({ x: 0.07 + Math.random() * 0.86, y: 0.07 + Math.random() * 0.86 });
+      bestRoute = []; tryingRoute = []; bestSoFar = [];
+      refresh();
+    }
+
+    function resetAll() {
+      if (animTimeout) clearTimeout(animTimeout);
+      solving = false;
+      cities = []; bestRoute = []; tryingRoute = []; bestSoFar = [];
+      refresh();
+    }
+
+    function setMode(m) {
+      mode = m;
+      document.getElementById('bf-btn').classList.toggle('active', m === 'brute');
+      document.getElementById('nn-btn').classList.toggle('active', m === 'nn');
+    }
+
+    function fact(n) {
+      if (n <= 0) return 1;
+      if (n > 20) return Infinity;
+      let r = 1; for (let i = 2; i <= n; i++) r *= i; return r;
+    }
+    function routes(n) { return n <= 1 ? 1 : fact(n - 1); }
+
+    function fmt(n) {
+      if (!isFinite(n)) return "> 10²⁰";
+      if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
+      if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
+      if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
+      if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+      if (n >= 1e3) return n.toLocaleString();
+      return String(n);
+    }
+
+    function calcStr(n) {
+      if (n <= 1) return '—';
+      const parts = [];
+      for (let i = n-1; i >= 1; i--) parts.push(i);
+      if (parts.length > 5) return `(${n-1})!`;
+      return parts.join(' × ');
+    }
+
+    function buildMathTable() {
+      const n = cities.length;
+      const tbody = document.getElementById('math-body');
+      tbody.innerHTML = '';
+      const rows = [2,3,4,5,6,8,10,15,20];
+      const maxLog = Math.log10(routes(20));
+      for (const r of rows) {
+        const rc = routes(r);
+        const tr = document.createElement('tr');
+        if (r === n) tr.classList.add('hl');
+        const logV = isFinite(rc) ? Math.log10(Math.max(rc,1)) : maxLog;
+        const pct = Math.min(100, (logV / maxLog) * 100);
+        tr.innerHTML = `<td>${r}${r === n ? ' ← you' : ''}</td><td style="font-size:11px">${calcStr(r)}</td><td>${fmt(rc)}</td><td style="padding:5px 8px"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></td>`;
+        tbody.appendChild(tr);
+      }
+      const displayN = n >= 2 ? n : 4;
+      document.getElementById('wb-n').textContent = displayN;
+      const parts = [];
+      for (let i = displayN-1; i >= 1; i--) parts.push(i);
+      const calc = (parts.length > 4 ? `(${displayN-1})!` : parts.join(' × ')) + ' / 2 = ' + fmt(routes(displayN));
+      document.getElementById('wb-calc').textContent = calc;
+      document.getElementById('wb-mult').textContent = displayN;
+      document.getElementById('wb-mult2').textContent = displayN;
+    }
+
+    function refresh() {
+      const n = cities.length;
+      document.getElementById('s-n').textContent = n;
+      document.getElementById('s-routes').textContent = fmt(routes(n));
+      document.getElementById('s-dist').textContent = bestRoute.length > 1 ? routeDist(bestRoute).toFixed(0) : '—';
+      buildMathTable();
+      let msg = '';
+      if (n === 0) msg = 'Click the canvas to place cities.';
+      else if (n === 1) msg = 'Add at least 2 cities.';
+      else if (n === 2) msg = 'Only 1 route possible — trivial!';
+      else {
+        const rc = routes(n);
+        msg = `<strong>${n} cities</strong> → <strong>${fmt(rc)}</strong> possible routes. `;
+        if (mode === 'brute' && n > 11) msg += 'Too many for brute force — switch to nearest neighbor.';
+        else if (mode === 'brute') msg += 'Hit ▶ solve to watch brute force check every option.';
+        else msg += 'Hit ▶ solve to watch the nearest neighbor heuristic.';
+      }
+      document.getElementById('info').innerHTML = msg;
+      draw();
+    }
+
+    function px(c) { return { x: c.x * cw(), y: c.y * ch() }; }
+    function dist(a, b) {
+      const dx = (a.x - b.x) * cw(), dy = (a.y - b.y) * ch();
+      return Math.sqrt(dx*dx + dy*dy);
+    }
+    function routeDist(r) {
+      if (r.length < 2) return 0;
+      let d = 0;
+      for (let i = 0; i < r.length - 1; i++) d += dist(cities[r[i]], cities[r[i+1]]);
+      d += dist(cities[r[r.length-1]], cities[r[0]]);
+      return d;
+    }
+
+    function drawRoute(r, color, alpha, width) {
+      if (r.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = width;
+      const s = px(cities[r[0]]);
+      ctx.moveTo(s.x, s.y);
+      for (let i = 1; i < r.length; i++) { const p = px(cities[r[i]]); ctx.lineTo(p.x, p.y); }
+      ctx.lineTo(px(cities[r[0]]).x, px(cities[r[0]]).y);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, cw(), ch());
+      if (tryingRoute.length > 1) drawRoute(tryingRoute, 'rgba(100,100,100,0.45)', 1, 1.5);
+      if (bestSoFar.length > 1) drawRoute(bestSoFar, '#E24B4A', 0.6, 2);
+      if (bestRoute.length > 1) drawRoute(bestRoute, '#1D9E75', 1, 2.5);
+      cities.forEach((c, i) => {
+        const p = px(c);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, i === 0 ? 8 : 6, 0, Math.PI*2);
+        ctx.fillStyle = i === 0 ? '#1D9E75' : '#E24B4A';
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px system-ui';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(i+1, p.x, p.y);
+      });
+    }
+
+    function runSolve() {
+      if (solving || cities.length < 2) return;
+      if (mode === 'brute' && cities.length > 11) {
+        document.getElementById('info').innerHTML = `<strong>Too many cities for brute force!</strong> ${cities.length} cities = ${fmt(routes(cities.length))} routes. Switch to nearest neighbor.`;
+        return;
+      }
+      bestRoute = []; bestSoFar = []; tryingRoute = [];
+      solving = true;
+      document.getElementById('s-checked').textContent = '0';
+      document.getElementById('s-dist').textContent = '…';
+      if (mode === 'brute') animateBrute();
+      else animateNN();
+    }
+
+    function permutations(arr) {
+      if (arr.length <= 1) return [arr.slice()];
+      const res = [];
+      for (let i = 0; i < arr.length; i++) {
+        const rest = arr.filter((_, j) => j !== i);
+        for (const p of permutations(rest)) res.push([arr[i], ...p]);
+      }
+      return res;
+    }
+
+    function animateBrute() {
+      const others = Array.from({length: cities.length - 1}, (_, i) => i + 1);
+      const perms = permutations(others);
+      let bestD = Infinity;
+      let idx = 0;
+      const speed = cities.length <= 6 ? 200 : cities.length <= 8 ? 70 : 25;
+      const batch = cities.length <= 6 ? 1 : cities.length <= 8 ? 3 : 20;
+
+      function step() {
+        if (idx >= perms.length) {
+          tryingRoute = []; bestRoute = bestSoFar.slice(); solving = false;
+          document.getElementById('s-checked').textContent = fmt(perms.length);
+          document.getElementById('s-dist').textContent = bestD.toFixed(0);
+          document.getElementById('info').innerHTML = `<strong>Done!</strong> Checked all <strong>${fmt(perms.length)}</strong> routes. Best: <strong>${bestD.toFixed(0)}</strong> — this is the <em>optimal</em> solution.`;
+          draw(); return;
+        }
+        for (let b = 0; b < batch && idx < perms.length; b++, idx++) {
+          const r = [0, ...perms[idx]];
+          const d = routeDist(r);
+          tryingRoute = r;
+          if (d < bestD) { bestD = d; bestSoFar = r.slice(); }
+        }
+        document.getElementById('s-checked').textContent = fmt(idx);
+        document.getElementById('s-dist').textContent = bestD.toFixed(0);
+        document.getElementById('info').innerHTML = `Checking routes… <strong>${fmt(idx)}</strong> of <strong>${fmt(perms.length)}</strong>. Best so far: <strong>${bestD.toFixed(0)}</strong>`;
+        draw();
+        animTimeout = setTimeout(step, speed);
+      }
+      step();
+    }
+
+    function animateNN() {
+      const visited = new Array(cities.length).fill(false);
+      const path = [0]; visited[0] = true;
+
+      function tick() {
+        if (path.length === cities.length) {
+          bestRoute = path.slice(); tryingRoute = []; solving = false;
+          const d = routeDist(bestRoute);
+          document.getElementById('s-checked').textContent = cities.length - 1;
+          document.getElementById('s-dist').textContent = d.toFixed(0);
+          document.getElementById('info').innerHTML = `<strong>Done!</strong> Made <strong>${cities.length - 1}</strong> greedy choices. Distance: <strong>${d.toFixed(0)}</strong> — good but <em>not guaranteed optimal</em>.`;
+          draw(); return;
+        }
+        const last = path[path.length - 1];
+        let best = -1, bestD = Infinity;
+        for (let i = 0; i < cities.length; i++) {
+          if (!visited[i]) { const d = dist(cities[last], cities[i]); if (d < bestD) { bestD = d; best = i; } }
+        }
+        visited[best] = true; path.push(best);
+        tryingRoute = path.slice();
+        document.getElementById('s-checked').textContent = path.length - 1;
+        document.getElementById('info').innerHTML = `Step ${path.length - 1}: from city ${last+1}, nearest unvisited is city <strong>${best+1}</strong> (distance ${bestD.toFixed(0)}).`;
+        draw();
+        animTimeout = setTimeout(tick, 400);
+      }
+      tick();
+    }
+
+    addRandom(5);
+    refresh();
+  </script>
+</body>
+</html>
