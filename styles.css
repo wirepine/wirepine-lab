@@ -394,6 +394,310 @@ section h2::after {
   line-height: 1.6;
 }
 
+/* ============================================
+   API EXPLORER — carousel entry card
+   ============================================ */
+
+.api-explorer-bar {
+  display: flex;
+  gap: 3px;
+  margin-bottom: var(--space-sm);
+}
+
+.api-explorer-bar span {
+  flex: 1;
+  height: 3px;
+  border-radius: 1px;
+}
+
+/* ============================================
+   API EXPLORER CARDS
+   ============================================ */
+
+.api-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.api-card-tag {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.45;
+  margin-bottom: -0.2rem;
+}
+
+.api-card h3 {
+  margin-bottom: 0;
+}
+
+.api-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0;
+  min-height: 90px;
+}
+
+.api-card-body p {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--color-text);
+}
+
+.api-card-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.22rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.api-card-stat:last-child {
+  border-bottom: none;
+}
+
+.api-card-stat-label {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.api-card-stat-value {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.api-card-img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+
+.api-card-title-sm {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 0.4rem;
+}
+
+.api-card-sub {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+.api-temp-big {
+  font-family: var(--font-sans);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.api-temp-big span {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.api-trivia-question {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.api-trivia-cat {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.api-trivia-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+}
+
+.api-trivia-option {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 0.3rem 0.4rem;
+  font-size: 0.68rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text);
+  transition: border-color 0.15s;
+  border-radius: 2px;
+  line-height: 1.3;
+}
+
+.api-trivia-option:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.api-trivia-option.correct {
+  background: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+
+.api-trivia-option.incorrect {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.api-pokemon-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.api-pokemon-sprite {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.api-pokemon-name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.api-pokemon-num {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  margin-top: 0.1rem;
+}
+
+.api-fact-text {
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.api-loading {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.api-tabs {
+  display: flex;
+  align-self: flex-start;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.api-tab {
+  background: transparent;
+  border: none;
+  padding: 0.2rem 0.65rem;
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.api-tab + .api-tab {
+  border-left: 1px solid var(--color-border);
+}
+
+.api-tab.active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.api-code {
+  font-family: "Courier New", monospace;
+  font-size: 0.67rem;
+  line-height: 1.6;
+  background: #0a1a1a;
+  color: #6ee7b7;
+  padding: 0.75rem;
+  overflow-x: auto;
+  border-radius: 2px;
+  margin: 0;
+  white-space: pre;
+  flex: 1;
+  scrollbar-width: thin;
+}
+
+.api-code .code-comment {
+  color: #4b6f5e;
+}
+
+.api-card-refresh {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  align-self: flex-start;
+  margin-top: auto;
+  border-radius: 2px;
+}
+
+.api-card-refresh:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Color variants — top stripe + gradient tint + hover bar */
+.api-card--iss     { border-top: 3px solid #6366f1; background: linear-gradient(160deg, rgba(99,102,241,0.07) 0%, var(--color-surface) 45%); }
+.api-card--nasa    { border-top: 3px solid #8b5cf6; background: linear-gradient(160deg, rgba(139,92,246,0.07) 0%, var(--color-surface) 45%); }
+.api-card--trivia  { border-top: 3px solid #10b981; background: linear-gradient(160deg, rgba(16,185,129,0.07) 0%, var(--color-surface) 45%); }
+.api-card--pokemon { border-top: 3px solid #ef4444; background: linear-gradient(160deg, rgba(239,68,68,0.07) 0%, var(--color-surface) 45%); }
+.api-card--weather { border-top: 3px solid #0ea5e9; background: linear-gradient(160deg, rgba(14,165,233,0.07) 0%, var(--color-surface) 45%); }
+.api-card--cat     { border-top: 3px solid #f59e0b; background: linear-gradient(160deg, rgba(245,158,11,0.07) 0%, var(--color-surface) 45%); }
+.api-card--dog     { border-top: 3px solid #14b8a6; background: linear-gradient(160deg, rgba(20,184,166,0.07) 0%, var(--color-surface) 45%); }
+.api-card--wiki    { border-top: 3px solid #64748b; background: linear-gradient(160deg, rgba(100,116,139,0.07) 0%, var(--color-surface) 45%); }
+
+.api-card--iss::before     { background: #6366f1; }
+.api-card--nasa::before    { background: #8b5cf6; }
+.api-card--trivia::before  { background: #10b981; }
+.api-card--pokemon::before { background: #ef4444; }
+.api-card--weather::before { background: #0ea5e9; }
+.api-card--cat::before     { background: #f59e0b; }
+.api-card--dog::before     { background: #14b8a6; }
+.api-card--wiki::before    { background: #64748b; }
+
 /* Featured Artifact */
 .artifact {
   border-bottom: 1px solid var(--color-border);

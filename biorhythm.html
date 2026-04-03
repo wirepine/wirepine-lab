@@ -273,6 +273,29 @@
       margin-bottom: 32px;
     }
 
+    /* Photo block */
+    .bio-photo-block {
+      max-width: 420px;
+      margin: 0 auto 40px;
+    }
+
+    .bio-photo-block img {
+      width: 100%;
+      display: block;
+      border: 1px solid rgba(0,200,150,0.3);
+      box-shadow: 0 0 24px rgba(0,200,100,0.1);
+    }
+
+    .bio-photo-caption {
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      font-style: italic;
+      line-height: 1.65;
+      color: rgba(0,200,150,0.65);
+      margin-top: 14px;
+      text-align: left;
+    }
+
     /* ── Scrubber ── */
     .bio-scrubber-wrap {
       border: 1px solid rgba(0,200,150,0.2);
@@ -532,6 +555,9 @@
     html:not([data-theme="dark"]) .bio-back:hover {
       color: var(--color-teal-light);
     }
+    html:not([data-theme="dark"]) .bio-photo-caption {
+      color: var(--color-text);
+    }
   </style>
 </head>
 <body>
@@ -640,6 +666,11 @@
   </div>
 
   <div class="bio-footnote">For entertainment purposes only · Pseudoscience since 1897</div>
+
+  <div class="bio-photo-block">
+    <img src="HS%20Biorythm.jpeg" alt="Science Club Biorhythm printout, 1982">
+    <p class="bio-photo-caption">In 1982 I was President of the Science Club (I know) and I charged .25 for a Biorythm. In 2026 I paid Claude .24 cents of API time (10 minutes/40K tokens) and built this. Who's the president now.</p>
+  </div>
 
   <a href="index.html" class="bio-back">← Back to Wirepine Lab</a>
 

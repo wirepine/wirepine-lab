@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Explorer — Wirepine Lab</title>
+  <link rel="icon" type="image/png" href="Wirepine Lab Transparent v1.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .api-page-header {
+      padding-top: calc(60px + var(--space-lg));
+      padding-bottom: var(--space-md);
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-left: var(--space-md);
+      padding-right: var(--space-md);
+    }
+
+    .api-back {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-accent);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: var(--space-sm);
+      transition: opacity 0.2s;
+    }
+
+    .api-back:hover { opacity: 0.7; }
+
+    .api-page-title {
+      font-family: var(--font-sans);
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: var(--space-xs);
+    }
+
+    .api-page-desc {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+      max-width: 520px;
+      margin-top: 0.75rem;
+    }
+
+    .api-grid-section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--space-md) var(--space-md) var(--space-xl);
+    }
+
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .api-grid .experiment-card {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 1024px) {
+      .api-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .api-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="nav-logo"></a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">Dark</button>
+  </nav>
+
+  <main>
+    <div class="api-page-header">
+      <a href="index.html" class="api-back">← Back to Lab</a>
+      <h1 class="api-page-title">API Explorer</h1>
+      <p class="api-page-desc">8 live public APIs — no sign-up, no keys. Hit <strong>Live</strong> to see fresh data, <strong>Code</strong> to see how it's called.</p>
+    </div>
+
+    <div class="api-grid-section">
+      <div class="api-grid">
+
+        <!-- ISS Tracker -->
+        <article class="experiment-card api-card api-card--iss">
+          <div class="api-card-tag">wheretheiss.at</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>🛸 ISS Tracker</h3>
+          <div class="api-card-body" id="api-iss">
+            <span class="api-loading">Locating station…</span>
+          </div>
+          <pre class="api-code" hidden>fetch('https://api.wheretheiss.at
+  /v1/satellites/25544')
+  .then(r => r.json())
+  .then(d => {
+    d.latitude   <span class="code-comment">// e.g. 45.32</span>
+    d.longitude  <span class="code-comment">// e.g. -87.21</span>
+    d.altitude   <span class="code-comment">// km above Earth</span>
+    d.velocity   <span class="code-comment">// speed in km/h</span>
+  });</pre>
+          <button class="api-card-refresh" onclick="fetchISS()">↻ Refresh</button>
+        </article>
+
+        <!-- NASA APOD -->
+        <article class="experiment-card api-card api-card--nasa">
+          <div class="api-card-tag">api.nasa.gov</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>🔭 Photo of the Day</h3>
+          <div class="api-card-body" id="api-nasa">
+            <span class="api-loading">Contacting NASA…</span>
+          </div>
+          <pre class="api-code" hidden>fetch('https://api.nasa.gov/planetary
+  /apod?api_key=DEMO_KEY')
+  .then(r => r.json())
+  .then(d => {
+    d.title        <span class="code-comment">// photo title</span>
+    d.url          <span class="code-comment">// image URL</span>
+    d.date         <span class="code-comment">// YYYY-MM-DD</span>
+    d.explanation  <span class="code-comment">// description</span>
+    d.media_type   <span class="code-comment">// "image" or "video"</span>
+  });</pre>
+          <button class="api-card-refresh" onclick="fetchNASA()">↻ Refresh</button>
+        </article>
+
+        <!-- Trivia -->
+        <article class="experiment-card api-card api-card--trivia">
+          <div class="api-card-tag">opentdb.com</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>🎯 Trivia Challenge</h3>
+          <div class="api-card-body" id="api-trivia">
+            <span class="api-loading">Loading question…</span>
+          </div>
+          <pre class="api-code" hidden>fetch('https://opentdb.com/api.php
+  ?amount=1&type=multiple')
+  .then(r => r.json())
+  .then(d => {
+    const q = d.results[0];
+    q.question          <span class="code-comment">// the question</span>
+    q.correct_answer    <span class="code-comment">// right answer</span>
+    q.incorrect_answers <span class="code-comment">// array of 3</span>
+    q.category          <span class="code-comment">// e.g. "Science"</span>
+    q.difficulty        <span class="code-comment">// easy/medium/hard</span>
+  });</pre>
+          <button class="api-card-refresh" onclick="fetchTrivia()">↻ New Question</button>
+        </article>
+
+        <!-- Pokemon -->
+        <article class="experiment-card api-card api-card--pokemon">
+          <div class="api-card-tag">pokeapi.co</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>⚡ Random Pokémon</h3>
+          <div class="api-card-body" id="api-pokemon">
+            <span class="api-loading">Searching Pokédex…</span>
+          </div>
+          <pre class="api-code" hidden><span class="code-comment">// IDs 1–898 are valid</span>
+const id = Math.floor(Math.random() * 898) + 1;
+
+fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+  .then(r => r.json())
+  .then(d => {
+    d.name                   <span class="code-comment">// "pikachu"</span>
+    d.sprites.front_default  <span class="code-comment">// sprite URL</span>
+    d.types[0].type.name     <span class="code-comment">// "electric"</span>
+    d.stats[0].base_stat     <span class="code-comment">// HP value</span>
+  });</pre>
+          <button class="api-card-refresh" onclick="fetchPokemon()">↻ New Pokémon</button>
+        </article>
+
+        <!-- Weather -->
+        <article class="experiment-card api-card api-card--weather">
+          <div class="api-card-tag">open-meteo.com</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>🌤 SF Weather</h3>
+          <div class="api-card-body" id="api-weather">
+            <span class="api-loading">Checking skies…</span>
+          </div>
+          <pre class="api-code" hidden><span class="code-comment">// No API key needed!</span>
+fetch('https://api.open-meteo.com/v1/forecast
+  ?latitude=37.77&longitude=-122.42
+  &current_weather=true
+  &temperature_unit=fahrenheit')
+  .then(r => r.json())
+  .then(d => {
+    const w = d.current_weather;
+    w.temperature  <span class="code-comment">// °F</span>
+    w.windspeed    <span class="code-comment">// mph</span>
+    w.weathercode  <span class="code-comment">// WMO weather code</span>
+  });</pre>
+          <button class="api-card-refresh" onclick="fetchWeather()">↻ Refresh</button>
+        </article>
+
+        <!-- Cat GIF -->
+        <article class="experiment-card api-card api-card--cat">
+          <div class="api-card-tag">cataas.com</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>🐱 Cat GIF</h3>
+          <div class="api-card-body" id="api-cat">
+            <span class="api-loading">Summoning a cat…</span>
+          </div>
+          <pre class="api-code" hidden><span class="code-comment">// The URL *is* the response — no JSON!</span>
+const img = document.createElement('img');
+img.src = 'https://cataas.com/cat/gif';
+document.body.appendChild(img);
+
+<span class="code-comment">// Add ?t=Date.now() to bust the cache</span>
+<span class="code-comment">// and get a fresh cat every time.</span>
+<span class="code-comment">// Try: /cat/gif?type=square</span>
+<span class="code-comment">// or:  /cat (returns a still photo)</span></pre>
+          <button class="api-card-refresh" onclick="fetchCat()">↻ New Cat</button>
+        </article>
+
+        <!-- Dog -->
+        <article class="experiment-card api-card api-card--dog">
+          <div class="api-card-tag">dog.ceo</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>🐕 Random Dog</h3>
+          <div class="api-card-body" id="api-dog">
+            <span class="api-loading">Fetching a good boy…</span>
+          </div>
+          <pre class="api-code" hidden>fetch('https://dog.ceo/api/breeds/image/random')
+  .then(r => r.json())
+  .then(d => {
+    d.message  <span class="code-comment">// image URL</span>
+    d.status   <span class="code-comment">// "success"</span>
+  });
+
+<span class="code-comment">// Breed is encoded in the URL path:</span>
+<span class="code-comment">// .../breeds/[breed]/[file].jpg</span>
+<span class="code-comment">// Try: /api/breed/husky/images/random</span></pre>
+          <button class="api-card-refresh" onclick="fetchDog()">↻ New Dog</button>
+        </article>
+
+        <!-- Wikipedia -->
+        <article class="experiment-card api-card api-card--wiki">
+          <div class="api-card-tag">en.wikipedia.org</div>
+          <div class="api-tabs">
+            <button class="api-tab active" onclick="apiTab(this,'live')">Live</button>
+            <button class="api-tab" onclick="apiTab(this,'code')">Code</button>
+          </div>
+          <h3>📖 Wikipedia Random</h3>
+          <div class="api-card-body" id="api-wiki">
+            <span class="api-loading">Opening a random article…</span>
+          </div>
+          <pre class="api-code" hidden>fetch('https://en.wikipedia.org
+  /api/rest_v1/page/random/summary')
+  .then(r => r.json())
+  .then(d => {
+    d.title        <span class="code-comment">// article title</span>
+    d.extract      <span class="code-comment">// short summary text</span>
+    d.thumbnail    <span class="code-comment">// {source, width, height}</span>
+    d.content_urls <span class="code-comment">// .desktop.page = full URL</span>
+  });</pre>
+          <button class="api-card-refresh" onclick="fetchWiki()">↻ New Article</button>
+        </article>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="https://wirepine.com"><img src="Wirepine Lab Transparent v1.png" alt="Wirepine" class="footer-logo"></a>
+        <div class="footer-links">
+          <a href="https://wirepine.com">wirepine.com</a>
+          <a href="https://newsletter.wirepine.com">newsletter</a>
+          <a href="index.html">← back to lab</a>
+        </div>
+      </div>
+      <p class="footer-copyright">&copy; 2026 Wirepine. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ── Theme toggle ──────────────────────────────
+    const toggle = document.getElementById('theme-toggle');
+    const root   = document.documentElement;
+    const nav    = document.querySelector('.nav');
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      root.removeAttribute('data-theme');
+      toggle.textContent = 'Dark';
+    } else {
+      root.setAttribute('data-theme', 'dark');
+      toggle.textContent = 'Light';
+    }
+
+    toggle.addEventListener('click', () => {
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        root.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        toggle.textContent = 'Dark';
+      } else {
+        root.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = 'Light';
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // ── Tab switcher ──────────────────────────────
+    function apiTab(btn, tab) {
+      const card   = btn.closest('.experiment-card');
+      const isCode = tab === 'code';
+      card.querySelector('.api-card-body').hidden  = isCode;
+      card.querySelector('.api-code').hidden       = !isCode;
+      card.querySelector('.api-card-refresh').hidden = isCode;
+      card.querySelectorAll('.api-tab').forEach(t =>
+        t.classList.toggle('active', t === btn)
+      );
+    }
+
+    // ── Helpers ───────────────────────────────────
+    function decodeHTML(str) {
+      const txt = document.createElement('textarea');
+      txt.innerHTML = str;
+      return txt.value;
+    }
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function stat(label, value) {
+      return `<div class="api-card-stat">
+        <span class="api-card-stat-label">${label}</span>
+        <span class="api-card-stat-value">${value}</span>
+      </div>`;
+    }
+
+    // ── ISS Tracker ───────────────────────────────
+    async function fetchISS() {
+      const el = document.getElementById('api-iss');
+      el.innerHTML = '<span class="api-loading">Locating station…</span>';
+      try {
+        const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+        const d = await r.json();
+        const lat = parseFloat(d.latitude).toFixed(2);
+        const lon = parseFloat(d.longitude).toFixed(2);
+        const alt = Math.round(d.altitude);
+        const spd = Math.round(d.velocity).toLocaleString();
+        el.innerHTML =
+          stat('Latitude',  `${Math.abs(lat)}° ${lat >= 0 ? 'N' : 'S'}`) +
+          stat('Longitude', `${Math.abs(lon)}° ${lon >= 0 ? 'E' : 'W'}`) +
+          stat('Altitude',  `${alt} km`) +
+          stat('Speed',     `${spd} km/h`);
+      } catch {
+        el.innerHTML = '<span class="api-loading">Could not reach API</span>';
+      }
+    }
+
+    // ── NASA APOD ─────────────────────────────────
+    const NASA_CACHE_KEY = 'wirepine_apod';
+
+    async function fetchNASA() {
+      const el = document.getElementById('api-nasa');
+      el.innerHTML = '<span class="api-loading">Contacting NASA…</span>';
+      try {
+        const cached = JSON.parse(localStorage.getItem(NASA_CACHE_KEY) || 'null');
+        if (cached && Date.now() - cached.ts < 86400000) {
+          renderAPOD(el, cached.data);
+          return;
+        }
+      } catch {}
+      try {
+        const r = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
+        const d = await r.json();
+        localStorage.setItem(NASA_CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() }));
+        renderAPOD(el, d);
+      } catch {
+        el.innerHTML = '<span class="api-loading">Could not reach NASA</span>';
+      }
+    }
+
+    function renderAPOD(el, d) {
+      el.innerHTML = `
+        ${d.media_type === 'image'
+          ? `<img src="${esc(d.url)}" alt="${esc(d.title)}" class="api-card-img">`
+          : `<div class="api-loading">Today's entry is a video</div>`}
+        <div class="api-card-title-sm">${esc(d.title)}</div>
+        <div class="api-card-sub">${esc(d.date)}</div>
+      `;
+    }
+
+    // ── Trivia ────────────────────────────────────
+    async function fetchTrivia() {
+      const el = document.getElementById('api-trivia');
+      el.innerHTML = '<span class="api-loading">Loading question…</span>';
+      try {
+        const r = await fetch('https://opentdb.com/api.php?amount=1&type=multiple');
+        const d = await r.json();
+        const q       = d.results[0];
+        const question = decodeHTML(q.question);
+        const correct  = decodeHTML(q.correct_answer);
+        const answers  = [...q.incorrect_answers.map(decodeHTML), correct]
+          .sort(() => Math.random() - 0.5);
+        el.dataset.correct = correct;
+        el.innerHTML = `
+          <div class="api-trivia-cat">${esc(q.category)}</div>
+          <div class="api-trivia-question">${esc(question)}</div>
+          <div class="api-trivia-options">
+            ${answers.map(a => `
+              <button class="api-trivia-option" data-answer="${esc(a)}" onclick="checkAnswer(this)">
+                ${esc(a)}
+              </button>`).join('')}
+          </div>
+        `;
+      } catch {
+        el.innerHTML = '<span class="api-loading">Could not load trivia</span>';
+      }
+    }
+
+    function checkAnswer(btn) {
+      const body    = btn.closest('.api-card-body');
+      const correct = body.dataset.correct;
+      body.querySelectorAll('.api-trivia-option').forEach(o => {
+        o.disabled = true;
+        if (o.dataset.answer === correct) o.classList.add('correct');
+        else if (o === btn)              o.classList.add('incorrect');
+      });
+    }
+
+    // ── Pokémon ───────────────────────────────────
+    async function fetchPokemon() {
+      const el = document.getElementById('api-pokemon');
+      el.innerHTML = '<span class="api-loading">Searching Pokédex…</span>';
+      try {
+        const id = Math.floor(Math.random() * 898) + 1;
+        const r  = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const d  = await r.json();
+        const name   = d.name.charAt(0).toUpperCase() + d.name.slice(1);
+        const types  = d.types.map(t => t.type.name).join(' · ');
+        const hp     = d.stats.find(s => s.stat.name === 'hp').base_stat;
+        const atk    = d.stats.find(s => s.stat.name === 'attack').base_stat;
+        const sprite = d.sprites.front_default;
+        el.innerHTML = `
+          <div class="api-pokemon-row">
+            ${sprite ? `<img src="${esc(sprite)}" alt="${esc(name)}" class="api-pokemon-sprite">` : ''}
+            <div>
+              <div class="api-pokemon-name">${esc(name)}</div>
+              <div class="api-pokemon-num">#${String(id).padStart(3, '0')}</div>
+            </div>
+          </div>
+          ${stat('Type',   esc(types))}
+          ${stat('HP',     hp)}
+          ${stat('Attack', atk)}
+        `;
+      } catch {
+        el.innerHTML = '<span class="api-loading">Pokémon escaped!</span>';
+      }
+    }
+
+    // ── Weather (San Francisco) ───────────────────
+    const WMO = {
+      0:'Clear sky', 1:'Mainly clear', 2:'Partly cloudy', 3:'Overcast',
+      45:'Foggy', 48:'Icy fog', 51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+      61:'Light rain', 63:'Rain', 65:'Heavy rain', 71:'Light snow', 73:'Snow', 75:'Heavy snow',
+      80:'Showers', 81:'Rain showers', 82:'Heavy showers', 95:'Thunderstorm',
+    };
+
+    async function fetchWeather() {
+      const el = document.getElementById('api-weather');
+      el.innerHTML = '<span class="api-loading">Checking skies…</span>';
+      try {
+        const r  = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.77&longitude=-122.42&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph');
+        const d  = await r.json();
+        const cw = d.current_weather;
+        const tempF     = Math.round(cw.temperature);
+        const tempC     = Math.round((tempF - 32) * 5 / 9);
+        const condition = WMO[cw.weathercode] || 'Unknown';
+        el.innerHTML = `
+          <div class="api-temp-big">${tempF}°F <span>${tempC}°C</span></div>
+          ${stat('Condition', esc(condition))}
+          ${stat('Wind',      `${Math.round(cw.windspeed)} mph`)}
+        `;
+      } catch {
+        el.innerHTML = '<span class="api-loading">Could not reach weather API</span>';
+      }
+    }
+
+    // ── Cat GIF ───────────────────────────────────
+    function fetchCat() {
+      const el  = document.getElementById('api-cat');
+      el.innerHTML = '<span class="api-loading">Summoning a cat…</span>';
+      const img = new Image();
+      const url = `https://cataas.com/cat/gif?t=${Date.now()}`;
+      img.onload = () => {
+        el.innerHTML = `<img src="${url}" alt="Random cat GIF" class="api-card-img" style="height:140px;">`;
+      };
+      img.onerror = () => {
+        el.innerHTML = '<span class="api-loading">The cat refused to appear</span>';
+      };
+      img.src = url;
+    }
+
+    // ── Dog ───────────────────────────────────────
+    async function fetchDog() {
+      const el = document.getElementById('api-dog');
+      el.innerHTML = '<span class="api-loading">Fetching a good boy…</span>';
+      try {
+        const r    = await fetch('https://dog.ceo/api/breeds/image/random');
+        const d    = await r.json();
+        const parts    = d.message.split('/');
+        const breedRaw = parts[parts.length - 3] || 'unknown';
+        const breed    = breedRaw.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        el.innerHTML = `
+          <img src="${esc(d.message)}" alt="Random dog" class="api-card-img" style="height:140px; object-fit:cover;">
+          <div class="api-card-sub" style="margin-top:0.4rem;">${esc(breed)}</div>
+        `;
+      } catch {
+        el.innerHTML = '<span class="api-loading">The dog ran away</span>';
+      }
+    }
+
+    // ── Wikipedia Random ──────────────────────────
+    async function fetchWiki() {
+      const el = document.getElementById('api-wiki');
+      el.innerHTML = '<span class="api-loading">Opening a random article…</span>';
+      try {
+        const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary', {
+          headers: { Accept: 'application/json' }
+        });
+        const d       = await r.json();
+        const excerpt = d.extract ? d.extract.slice(0, 130) + '…' : '';
+        el.innerHTML = `
+          ${d.thumbnail ? `<img src="${esc(d.thumbnail.source)}" alt="" class="api-card-img" style="height:90px;">` : ''}
+          <div class="api-card-title-sm">${esc(d.title)}</div>
+          <div class="api-card-sub" style="line-height:1.45; margin-top:0.25rem;">${esc(excerpt)}</div>
+          <a href="${esc(d.content_urls.desktop.page)}" target="_blank" rel="noopener"
+             style="font-family:var(--font-sans); font-size:0.7rem; color:var(--color-accent); margin-top:0.4rem; display:inline-block;">
+            Read full article →
+          </a>
+        `;
+      } catch {
+        el.innerHTML = '<span class="api-loading">Wikipedia is unreachable</span>';
+      }
+    }
+
+    // ── Init all cards ────────────────────────────
+    fetchISS();
+    fetchNASA();
+    fetchTrivia();
+    fetchPokemon();
+    fetchWeather();
+    fetchCat();
+    fetchDog();
+    fetchWiki();
+  </script>
+</body>
+</html>
