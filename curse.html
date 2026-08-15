@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Mirror of Malediction — Wirepine Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#12232A;
+    --glass:#1A3A42;
+    --glass-lift:#245059;
+    --mercury:#DCE3EC;
+    --fog:#8FAFAF;
+    --brass:#E8B931;
+    --verdigris:#3D8B7A;
+    --oxblood:#B4503F;
+    --rule:rgba(220,227,236,.14);
+    --display:"IM Fell English SC",Georgia,serif;
+    --displayLower:"IM Fell English",Georgia,serif;
+    --body:"Spectral",Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #1E4650 0%, transparent 60%),
+      radial-gradient(80% 60% at 50% 110%, #16303A 0%, transparent 65%),
+      var(--obsidian);
+    color:var(--mercury);
+    font-family:var(--body);
+    font-weight:300;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:clamp(2.5rem,7vw,5rem) clamp(1.1rem,4vw,2rem) 5rem}
+
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--brass);margin:0 0 1.1rem;
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(2.1rem,6.4vw,3.5rem);
+    font-weight:400;line-height:1.06;letter-spacing:.01em;
+    margin:0 0 .9rem;
+  }
+  .standfirst{
+    font-family:var(--displayLower);font-style:italic;
+    font-size:clamp(1rem,2.4vw,1.15rem);color:var(--fog);
+    max-width:44ch;margin:0 0 2.4rem;
+  }
+
+  /* ---------- input ---------- */
+  .cast{display:flex;gap:.6rem;flex-wrap:wrap;align-items:stretch;margin-bottom:.7rem}
+  label{
+    display:block;font-family:var(--mono);font-size:.63rem;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--fog);margin-bottom:.55rem;
+  }
+  input[type=text]{
+    flex:1 1 15rem;min-width:0;
+    background:rgba(0,0,0,.28);
+    border:1px solid var(--rule);
+    border-bottom:1px solid rgba(232,185,49,.55);
+    border-radius:2px;
+    color:var(--mercury);
+    font-family:var(--body);font-size:1.15rem;
+    padding:.85rem 1rem;
+  }
+  input[type=text]::placeholder{color:#6C8E93;font-style:italic}
+  input[type=text]:focus{outline:2px solid var(--brass);outline-offset:2px;background:rgba(0,0,0,.4)}
+  button{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+    background:var(--brass);color:#14262B;border:none;border-radius:2px;
+    padding:.9rem 1.6rem;cursor:pointer;transition:background .18s ease,transform .18s ease;
+  }
+  button:hover{background:#F5D76E}
+  button:active{transform:translateY(1px)}
+  button:focus-visible{outline:2px solid var(--mercury);outline-offset:3px}
+  .ghost{background:transparent;color:var(--fog);border:1px solid var(--rule);padding:.6rem 1rem}
+  .ghost:hover{background:rgba(255,255,255,.05);color:var(--mercury)}
+  .note{font-family:var(--mono);font-size:.68rem;color:var(--fog);letter-spacing:.04em;min-height:1.4em}
+
+  /* ---------- the mirror (signature) ---------- */
+  .mirror{
+    position:relative;overflow:hidden;
+    margin:2.6rem 0 0;padding:2.2rem clamp(1rem,4vw,2.4rem);
+    border:1px solid var(--rule);border-radius:3px;
+    background:linear-gradient(168deg,#245059 0%,#152C33 55%,#1E434C 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 22px 50px -30px #000;
+  }
+  .mirror::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.09) 47%,rgba(255,255,255,.02) 53%,transparent 62%);
+    background-size:260% 100%;
+    animation:sheen 9s ease-in-out infinite;
+  }
+  @keyframes sheen{0%,72%{background-position:130% 0}100%{background-position:-40% 0}}
+  .face{
+    font-family:var(--display);
+    font-size:clamp(1.5rem,7vw,2.9rem);
+    text-align:center;letter-spacing:.06em;line-height:1.25;
+    word-break:break-word;
+  }
+  .face.given{color:#6C8E93}
+  .silver{
+    height:1px;margin:1.3rem auto;max-width:82%;
+    background:linear-gradient(90deg,transparent,rgba(220,227,236,.55),transparent);
+  }
+  .face.reflected{
+    color:var(--mercury);
+    text-shadow:0 0 26px rgba(160,190,220,.28);
+    transform:scaleX(-1);
+    transition:transform 1.05s cubic-bezier(.6,-0.15,.25,1.2), color .8s ease;
+  }
+  .mirror.resolved .face.reflected{transform:scaleX(1);color:#F2F5F9}
+  .mirror-hint{
+    font-family:var(--mono);font-size:.62rem;letter-spacing:.26em;text-transform:uppercase;
+    color:#6C8E93;text-align:center;margin-top:1.5rem;
+  }
+
+  /* ---------- verdict ---------- */
+  .verdict{margin-top:2.6rem;opacity:0;transform:translateY(14px);transition:opacity .7s ease .25s,transform .7s ease .25s}
+  .verdict.shown{opacity:1;transform:none}
+  .verdict[hidden]{display:none}
+
+  .incant{
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+    padding:1.7rem 0;text-align:center;
+  }
+  .incant .spell{
+    font-family:var(--display);font-size:clamp(1.6rem,5.6vw,2.4rem);
+    color:var(--brass);letter-spacing:.04em;line-height:1.15;margin:0;
+  }
+  .incant .say{font-family:var(--mono);font-size:.74rem;color:var(--fog);letter-spacing:.12em;margin:.7rem 0 0}
+
+  .field{padding:1.5rem 0;border-bottom:1px solid var(--rule)}
+  .field h2{
+    font-family:var(--mono);font-size:.63rem;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--fog);font-weight:400;margin:0 0 .7rem;
+  }
+  .field p{margin:0;font-size:1.05rem}
+  .field p + p{margin-top:.6rem}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 2rem}
+  @media (max-width:560px){.grid{grid-template-columns:1fr}}
+
+  .pips{display:flex;gap:.4rem;align-items:center;margin-top:.2rem}
+  .pip{width:1.7rem;height:.3rem;border-radius:1px;background:rgba(220,227,236,.15)}
+  .pip.on{background:var(--oxblood)}
+  .tier{font-family:var(--mono);font-size:.78rem;color:var(--mercury);margin-top:.7rem;letter-spacing:.06em}
+
+  .wandbox{display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap}
+  svg.wand{flex:0 0 auto;background:rgba(0,0,0,.22);border:1px solid var(--rule);border-radius:2px}
+  svg.wand .trace{
+    fill:none;stroke:var(--brass);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+    animation:draw 2.4s ease forwards .5s;
+  }
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .wandbox p{flex:1 1 12rem}
+
+  .counter{color:var(--verdigris)}
+  .counter .spell-sm{font-family:var(--display);font-size:1.25rem;letter-spacing:.05em}
+
+  footer{margin-top:2.4rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+  .fineprint{
+    font-family:var(--mono);font-size:.62rem;color:#6C8E93;letter-spacing:.1em;
+    margin-top:2.5rem;line-height:1.9;
+  }
+
+
+  .lab-back{
+    display:block;text-align:center;margin:3rem 0 0;
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;
+    color:rgba(232,185,49,.55);text-decoration:none;
+  }
+  .lab-back:hover{color:var(--brass)}
+  .lab-back:focus-visible{outline:2px solid var(--brass);outline-offset:4px}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .face.reflected{transform:scaleX(-1)}
+    .mirror.resolved .face.reflected{transform:scaleX(1)}
+    svg.wand .trace{stroke-dashoffset:0}
+    .verdict{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Department of Mysteries &middot; Reflection Wing</p>
+  <h1>The Mirror of Malediction</h1>
+  <p class="standfirst">Every name, read backwards, is a curse waiting for someone to say it out loud. Give the mirror a name and find out which one you are.</p>
+
+  <div>
+    <label for="name">Name to be reversed</label>
+    <div class="cast">
+      <input type="text" id="name" placeholder="e.g. Minerva" autocomplete="off" spellcheck="false" maxlength="40">
+      <button id="go">Read the mirror</button>
+    </div>
+    <p class="note" id="note" role="status" aria-live="polite"></p>
+  </div>
+
+  <section class="mirror" id="mirror" aria-hidden="true">
+    <div class="face given" id="given">&nbsp;</div>
+    <div class="silver"></div>
+    <div class="face reflected" id="reflected">&nbsp;</div>
+    <p class="mirror-hint" id="hint">The glass is empty</p>
+  </section>
+
+  <section class="verdict" id="verdict" hidden>
+    <div class="incant">
+      <p class="spell" id="spell"></p>
+      <p class="say" id="say"></p>
+    </div>
+
+    <div class="field">
+      <h2>What it does</h2>
+      <p id="effect"></p>
+      <p id="tell"></p>
+    </div>
+
+    <div class="field">
+      <h2>Wand movement</h2>
+      <div class="wandbox">
+        <svg class="wand" id="wandsvg" width="132" height="132" viewBox="0 0 132 132" role="img" aria-label="Diagram of the wand movement"></svg>
+        <p id="wandtext"></p>
+      </div>
+    </div>
+
+    <div class="field grid">
+      <div>
+        <h2>Severity</h2>
+        <div class="pips" id="pips"></div>
+        <p class="tier" id="tier"></p>
+      </div>
+      <div>
+        <h2>Traceable by</h2>
+        <p id="trace"></p>
+      </div>
+    </div>
+
+    <div class="field counter">
+      <h2>Counter-curse</h2>
+      <p><span class="spell-sm" id="cure"></span></p>
+      <p id="curenote"></p>
+    </div>
+
+    <footer>
+      <button class="ghost" id="copy">Copy the curse</button>
+    </footer>
+  </section>
+
+  <p class="fineprint">
+    Filed under invented magic. No real hexes were harmed.<br>
+    The same name always returns the same curse. That is how mirrors work.
+  </p>
+
+  <a href="index.html" class="lab-back">&larr; Back to Wirepine Lab</a>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const nameEl=$("name"), goEl=$("go"), noteEl=$("note"), mirrorEl=$("mirror"),
+        givenEl=$("given"), reflectedEl=$("reflected"), hintEl=$("hint"), verdictEl=$("verdict");
+
+  /* ---------- reversal ---------- */
+  // Reverse the letters of each word, then reverse the word order:
+  // "Andrew Marks" -> "Skram Werdna"
+  function reverseName(raw){
+    const words = raw.trim().split(/\s+/).filter(Boolean);
+    return words
+      .map(w => [...w].reverse().join(""))
+      .reverse()
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+  }
+  function tidy(raw){
+    return raw.trim().split(/\s+/).filter(Boolean)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  /* ---------- deterministic seeding ---------- */
+  function hash(str, salt){
+    let h = 0x811c9dc5 ^ salt;
+    const s = (salt + str.toLowerCase()).replace(/[^a-z0-9]/g,"");
+    for(let i=0;i<s.length;i++){
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return Math.abs(h);
+  }
+  const pick = (arr, str, salt) => arr[hash(str,salt) % arr.length];
+
+  /* ---------- content ---------- */
+  const SUFFIX = ["Inversum","Retrograda","Speculo","Umbrago","Reversia","Vitrio","Nocturna","Contrario"];
+
+  const EFFECT = [
+    "Every mirror the target walks past shows them three seconds in the past. Harmless in a hallway. Catastrophic while shaving.",
+    "The target's shadow begins arriving eleven seconds late, and increasingly resents being followed.",
+    "Any door the target closes reopens behind them. Politely. Slowly. Always by the same amount.",
+    "The target's left shoe fills, gradually and irreversibly, with sand from a beach they have never visited.",
+    "The target can no longer say the name of the thing they want most. It comes out as the name of a fish.",
+    "Ink runs from every word the target writes about themselves. Other people's names stay perfectly dry.",
+    "Anything the target loses reappears within the hour in the pocket of the person who likes them least.",
+    "Every staircase the target climbs adds one step to the flight behind them.",
+    "The target's handwriting drifts, week by week, into their mother's.",
+    "Tea goes cold in the target's hands within four seconds, regardless of charm, thermos, or season.",
+    "The target hears faint, disappointed applause after everything they say aloud.",
+    "The target begins dreaming other people's Mondays and waking up tired for reasons that aren't theirs.",
+    "Birds land on the target. All of them. One at a time, courteously, without end.",
+    "The target's reflection starts blinking a half-beat early. Then it stops blinking altogether.",
+    "Every apology the target offers is delivered, in their own voice, to the wrong person entirely.",
+    "The target's keys work on every lock except the one they need most that day."
+  ];
+
+  const TELL = [
+    "You'll know it took: the room goes faintly of pencil shavings.",
+    "You'll know it took: something nearby smells like wet slate.",
+    "You'll know it took: a struck match, somewhere behind you, that nobody struck.",
+    "You'll know it took: the air tastes of hot iron for about a minute.",
+    "You'll know it took: stale birthday candles, in a room with no cake.",
+    "You'll know it took: every clock in earshot ticks once, together, then carries on."
+  ];
+
+  const TRACE = [
+    "A competent Auror, within nine days.",
+    "Cats. Only cats, and they won't say.",
+    "Nobody, until the target complains twice in the same sentence.",
+    "Any portrait painted before 1840.",
+    "The nearest sleeping child, immediately.",
+    "A single reliable witness, who will not be believed."
+  ];
+
+  const TIERS = [
+    "Class E — Domestic nuisance",
+    "Class D — Persistent irritant",
+    "Class C — Restricted hex",
+    "Class B — Serious malediction",
+    "Class A — Filed, sealed, and denied"
+  ];
+
+  const CURE_NOTE = [
+    "Say it aloud in a room with no mirrors. Once, correctly, without hearing yourself. Most people cannot.",
+    "Must be spoken by someone who has never mispronounced your name. Good luck.",
+    "Effective only at the exact hour the curse was cast, which nobody ever writes down.",
+    "Works on the first attempt or not at all. There is no second attempt.",
+    "Requires the target to say their own name and mean it. Harder than it sounds."
+  ];
+
+  const DIRS = [
+    {v:[0,-1], word:"up"},
+    {v:[1,-1], word:"up and right"},
+    {v:[1,0],  word:"right"},
+    {v:[1,1],  word:"down and right"},
+    {v:[0,1],  word:"down"},
+    {v:[-1,1], word:"down and left"},
+    {v:[-1,0], word:"left"},
+    {v:[-1,-1],word:"up and left"}
+  ];
+  const VERBS = ["a sharp flick","a slow drag","a short hook","a stab","a lazy sweep","a tight loop"];
+
+  /* ---------- wand movement from the letters ---------- */
+  function wandFor(letters){
+    const steps = letters.slice(0,5);
+    let x=66, y=66, pts=[[x,y]], words=[];
+    steps.forEach((ch,i)=>{
+      const d = DIRS[ch.charCodeAt(0) % 8];
+      const len = 20 + (ch.charCodeAt(0) % 3)*8;
+      x = Math.max(14, Math.min(118, x + d.v[0]*len));
+      y = Math.max(14, Math.min(118, y + d.v[1]*len));
+      pts.push([x,y]);
+      words.push(`${VERBS[(ch.charCodeAt(0)+i) % VERBS.length]} ${d.word}`);
+    });
+    return {pts, text: words.join(", ") + ", then lift the wand cleanly."};
+  }
+
+  function drawWand(pts){
+    const svg = $("wandsvg");
+    const d = pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1]).join(" ");
+    let len = 0;
+    for(let i=1;i<pts.length;i++){
+      len += Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
+    }
+    svg.innerHTML =
+      `<path class="trace" d="${d}" style="--len:${Math.ceil(len)}"></path>` +
+      `<circle cx="${pts[0][0]}" cy="${pts[0][1]}" r="2.6" fill="#6C8E93"></circle>` +
+      `<circle cx="${pts[pts.length-1][0]}" cy="${pts[pts.length-1][1]}" r="3.4" fill="#E8B931"></circle>`;
+  }
+
+  /* ---------- live mirror ---------- */
+  let lastCast = "";
+  nameEl.addEventListener("input", ()=>{
+    const raw = nameEl.value;
+    const clean = raw.replace(/[^\p{L}\p{M}\s'-]/gu,"");
+    givenEl.textContent = clean.trim() ? tidy(clean) : "\u00A0";
+    reflectedEl.textContent = clean.trim() ? reverseName(clean) : "\u00A0";
+    if(raw.trim() !== lastCast){
+      mirrorEl.classList.remove("resolved");
+      hintEl.textContent = clean.trim() ? "The glass has not been read" : "The glass is empty";
+    }
+  });
+
+  /* ---------- cast ---------- */
+  function cast(){
+    const raw = nameEl.value.replace(/[^\p{L}\p{M}\s'-]/gu,"").trim();
+    if(!raw){
+      noteEl.textContent = "The mirror needs a name. Type one.";
+      nameEl.focus();
+      return;
+    }
+    noteEl.textContent = "";
+    lastCast = nameEl.value.trim();
+
+    const forward = tidy(raw);
+    const back = reverseName(raw);
+    const letters = [...raw.toLowerCase().replace(/[^a-z]/g,"")];
+    const key = raw.toLowerCase();
+
+    givenEl.textContent = forward;
+    reflectedEl.textContent = back;
+    mirrorEl.classList.add("resolved");
+    hintEl.textContent = "Read aloud at your own risk";
+
+    const spell = back + " " + pick(SUFFIX, key, 11);
+    $("spell").textContent = spell;
+    $("say").textContent = "/ " + back.toUpperCase().split(" ").join(" · ") + " /";
+    $("effect").textContent = pick(EFFECT, key, 23);
+    $("tell").textContent = pick(TELL, key, 41);
+    $("trace").textContent = pick(TRACE, key, 59);
+
+    const sev = 1 + (hash(key,71) % 5);
+    $("pips").innerHTML = Array.from({length:5},(_,i)=>
+      `<span class="pip${i<sev?" on":""}"></span>`).join("");
+    $("tier").textContent = TIERS[sev-1];
+
+    const wand = wandFor(letters.length ? letters : ["a"]);
+    drawWand(wand.pts);
+    $("wandtext").textContent = wand.text;
+
+    $("cure").textContent = "Finite " + forward;
+    $("curenote").textContent = pick(CURE_NOTE, key, 89);
+
+    verdictEl.hidden = false;
+    requestAnimationFrame(()=>verdictEl.classList.add("shown"));
+
+    window.__curse = `${spell}\n\n${$("effect").textContent}\n\nWand movement: ${wand.text}\nSeverity: ${sev}/5 — ${TIERS[sev-1]}\nCounter-curse: Finite ${forward}`;
+  }
+
+  goEl.addEventListener("click", cast);
+  nameEl.addEventListener("keydown", e=>{ if(e.key==="Enter") cast(); });
+
+  $("copy").addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText(window.__curse || "");
+      $("copy").textContent = "Copied";
+      setTimeout(()=>{$("copy").textContent="Copy the curse";}, 1600);
+    }catch(e){
+      $("copy").textContent = "Copying is blocked here — select the text instead";
+      setTimeout(()=>{$("copy").textContent="Copy the curse";}, 2600);
+    }
+  });
+})();
+</script>
+</body>
+</html>
