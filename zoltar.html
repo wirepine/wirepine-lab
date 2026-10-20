@@ -422,6 +422,9 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
   .fd-card:not(.about-card) .fd-perf{margin-top:0}
 }
 .about .fd-paper{background:radial-gradient(ellipse 30% 20% at 90% 92%,#c7a96a44,#0000 70%),radial-gradient(ellipse 22% 28% at 6% 34%,#b5935533,#0000 70%),linear-gradient(180deg,#e6d7b0,#f3e9cc 22%,#efe2c0)}
+.marquee{z-index:10}
+.marquee .spider{right:62px;bottom:auto;top:calc(100% + 56px);transform-origin:50% -60px}
+.marquee .spider .thread{height:60px}
 </style></head><body>
 <div class="world asleep" id="world">
 
@@ -550,6 +553,10 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
           <defs><path id="arc" d="M44 112 Q260 18 476 112"></path></defs>
           <text text-anchor="middle"><textPath href="#arc" startOffset="50%">WIREPINE SPEA<tspan class="bad">K</tspan>S</textPath></text>
         </svg>
+        <div class="spider" aria-hidden="true">
+        <div class="thread"></div>
+        <svg viewBox="0 0 24 24" width="24" height="24"><g stroke="#8d86a8" stroke-width="1.2" fill="none" stroke-linecap="round"><path d="M9 11 L3 7 L1 9"></path><path d="M9 13 L2 12 L0 15"></path><path d="M9 14 L4 18 L3 22"></path><path d="M15 11 L21 7 L23 9"></path><path d="M15 13 L22 12 L24 15"></path><path d="M15 14 L20 18 L21 22"></path></g><ellipse cx="12" cy="14" rx="3.6" ry="4.4" fill="#2a2338"></ellipse><circle cx="12" cy="9" r="2.4" fill="#2a2338"></circle><circle cx="11" cy="8.6" r=".5" fill="#cf3529"></circle><circle cx="13" cy="8.6" r=".5" fill="#cf3529"></circle></svg>
+        </div>
         <span class="screw" style="left:16px;top:120px;--r:70deg" aria-hidden="true"></span>
         <span class="screw" style="right:16px;top:120px;--r:10deg" aria-hidden="true"></span>
       </div>
@@ -675,10 +682,6 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
         <div class="step"><span class="num">3</span><span class="lab">Receive</span><span class="txt">A fortune, a story, something to take away.</span></div>
       </div>
       <p class="quote">The future is uncertain,<br>but the stories are real.</p>
-      <div class="spider" aria-hidden="true">
-        <div class="thread"></div>
-        <svg viewBox="0 0 24 24" width="24" height="24"><g stroke="#8d86a8" stroke-width="1.2" fill="none" stroke-linecap="round"><path d="M9 11 L3 7 L1 9"></path><path d="M9 13 L2 12 L0 15"></path><path d="M9 14 L4 18 L3 22"></path><path d="M15 11 L21 7 L23 9"></path><path d="M15 13 L22 12 L24 15"></path><path d="M15 14 L20 18 L21 22"></path></g><ellipse cx="12" cy="14" rx="3.6" ry="4.4" fill="#2a2338"></ellipse><circle cx="12" cy="9" r="2.4" fill="#2a2338"></circle><circle cx="11" cy="8.6" r=".5" fill="#cf3529"></circle><circle cx="13" cy="8.6" r=".5" fill="#cf3529"></circle></svg>
-      </div>
     </section>
   </main>
 
@@ -834,7 +837,9 @@ $('#preview-motion').addEventListener('click',async()=>{
  motionPreviewTimer=setTimeout(()=>{oracle.setPhase(transport?.playing?'speaking':'idle');},8000);
 });
 
-$('#end-session').addEventListener('click',()=>disconnect());
+// End session: close the line and return the machine to its dormant, sleeping state.
+function sleep(){clearTimeout(idleTimer);clearTimeout(turnWatchdog);clearTimeout(restoreTimer);clearTimeout(motionPreviewTimer);wakeDone=false;sessionWanted=false;greetingPending=false;turn=null;transport?.close();setConnectedLabel(false);machine.classList.remove('awake');state('dormant');question.value='';question.blur();$('#wake').disabled=false;$('#wake-overlay').classList.remove('hidden');sign.textContent='The oracle is sleeping';status.textContent='The gears have been quiet. Until now.';}
+$('#end-session').addEventListener('click',sleep);
 $('#how').addEventListener('click',()=>$('#about').showModal());for(const id of ['close-about','back'])$('#'+id).addEventListener('click',()=>$('#about').close());for(const d of document.querySelectorAll('dialog'))d.addEventListener('click',e=>{if(e.target===d){if(d.id==='fortune-dialog')reset();else d.close();}});
 window.addEventListener('pagehide',()=>{disconnect();if(audio)audio.close();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(idleTimer);idleTimer=setTimeout(()=>disconnect('The machine rested while you were away. Ask again to reconnect.'),30000);}else if(transport?.ready&&!turn){clearTimeout(idleTimer);idleTimer=setTimeout(()=>disconnect(),120000);}});
