@@ -440,6 +440,10 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
 .world .egg{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;border:0;background:none;color:#7f8c84;font-family:'Special Elite','Courier New',monospace;font-size:11px;letter-spacing:1px;opacity:.75}
 .world .egg:hover,.world .egg[aria-pressed="true"]{color:#ffb054;opacity:1}
 .egg span:first-child{font-size:14px;filter:saturate(.7)}
+/* Pumpkin armed while asleep: a faint orange cue (moon, ball glow, unlit bulbs) without lighting the machine. */
+.pumpkin.asleep .moon-glyph{color:#ffb254;opacity:.95;filter:drop-shadow(0 0 5px #ff8a2acc)}
+.pumpkin.asleep .ball::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 62%,#ff8a2a2e,#c2410c12 45%,#0000 70%)}
+.pumpkin.asleep .bulb:not(.dead){background:radial-gradient(circle at 40% 35%,#8a5a2e,#4a2a12 70%)}
 </style></head><body>
 <div class="world asleep" id="world">
 
