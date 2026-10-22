@@ -444,6 +444,21 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
 .pumpkin.asleep .moon-glyph{color:#ffb254;opacity:.95;filter:drop-shadow(0 0 5px #ff8a2acc)}
 .pumpkin.asleep .ball::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 62%,#ff8a2a2e,#c2410c12 45%,#0000 70%)}
 .pumpkin.asleep .bulb:not(.dead){background:radial-gradient(circle at 40% 35%,#8a5a2e,#4a2a12 70%)}
+/* ---------- compact cabinet foot + mobile fit ---------- */
+.base{height:118px;margin-bottom:18px}
+.base .medallion{width:76px;height:76px}
+.base .plaque{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);margin:0;width:auto;white-space:nowrap;z-index:2}
+.cab{--z:1}
+.slot-input{font-size:calc(16px / var(--z))}
+@media (max-width:559px){.cab{--z:.8}}
+@media (max-width:429px){.cab{--z:.74}}
+@media (max-width:389px){.cab{--z:.68}}
+@media (max-width:359px){.cab{--z:.6}}
+@media (max-width:760px){
+  .base,.dispenser{display:none}
+  .row{padding-top:44px;gap:14px}
+  .slot-input::placeholder{font-size:calc(11.5px / var(--z))}
+}
 </style></head><body>
 <div class="world asleep" id="world">
 
@@ -640,7 +655,7 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
         <form class="deck" id="question-form">
           <label class="deck-label mono" for="question">Ask your question</label>
           <div class="ask-row">
-            <input class="slot-input" id="question" type="text" maxlength="300" placeholder="Will the machines be kind to me?" autocomplete="off" required aria-describedby="status">
+            <input class="slot-input" id="question" type="text" enterkeyhint="send" maxlength="300" placeholder="Will the machines be kind to me?" autocomplete="off" required aria-describedby="status">
             <button class="red" id="ask" type="button" aria-label="Press the red button to ask"><span><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="#3e0907" stroke-width="1.4" fill="none" stroke-linecap="round"><path d="M9 11 L3 7 L1 9"></path><path d="M9 13 L2 12 L0 15"></path><path d="M9 14 L4 18 L3 22"></path><path d="M15 11 L21 7 L23 9"></path><path d="M15 13 L22 12 L24 15"></path><path d="M15 14 L20 18 L21 22"></path></g><ellipse cx="12" cy="14" rx="3.6" ry="4.4" fill="#3e0907"></ellipse><circle cx="12" cy="9" r="2.4" fill="#3e0907"></circle></svg></span></button>
           </div>
           <div class="tokens">
@@ -652,12 +667,6 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
           <span class="screw" style="right:8px;bottom:8px;--r:45deg" aria-hidden="true"></span>
         </form>
 
-        <div class="coin mono">
-          <span class="slit" aria-hidden="true"></span>
-          <p>No quarter required<br>Voice plays on wake</p>
-          <span class="screw" style="right:10px;top:10px" aria-hidden="true"></span>
-          <span class="screw" style="right:10px;bottom:10px;--r:100deg" aria-hidden="true"></span>
-        </div>
 
         <div class="dispenser" aria-hidden="true">
           <div class="stub"></div>
@@ -680,8 +689,8 @@ a{color:#e2c88a}a:hover{color:#ffd98a}
             <rect x="6" y="6" width="420" height="120" fill="none" stroke="#b99b62" stroke-width="1.5" opacity=".5"></rect>
           </svg>
           <div class="medallion"><img src="assets/wirepine-mark.png" alt="Wirepine"></div>
+          <div class="plaque mono">A Wirepine Contraption</div>
         </div>
-        <div class="plaque mono">A Wirepine Contraption</div>
       </div>
 
       <div class="plinth" aria-hidden="true"></div>
@@ -852,7 +861,7 @@ question.addEventListener('focus',()=>{if(phase==='dormant')awaken();});
 question.addEventListener('input',()=>{if(phase!=='idle')return;ask.disabled=false;sign.textContent=question.value.trim()?'Press red button to ask':'Wirepine says: ask your question';if(transport?.ready&&Date.now()-activityAt>1800){activityAt=Date.now();transport.send({type:'user_activity'});}});
 document.querySelectorAll('.example').forEach(b=>b.addEventListener('click',()=>{if(phase==='dormant'){awaken();return;}question.value=b.dataset.question;question.dispatchEvent(new Event('input'));question.focus();}));
 // Queue a user question while preserving the delayed-response watchdog behavior.
-async function requestFortune(event){event.preventDefault();if(phase==='dormant'){awaken();return;}if(phase!=='idle')return;const q=question.value.trim();if(!q){sign.textContent='First, ask your question';status.textContent='Type a question above, or choose one of the suggestions.';question.focus();return;}clearTimeout(idleTimer);sessionWanted=true;turn={question:q,text:'',source:null,sent:false};state('connecting');sign.textContent='Opening the line';status.textContent='Connecting to Wirepine Speaks…';try{await unlockAudio();await ensureConnection();sendQueuedTurn();}catch(e){if(skipTried&&!TEXT_MODE){greetingSkipOk=false;skipTried=false;turn={question:q,text:'',source:null,sent:false};state('connecting');sign.textContent='Opening the line';status.textContent='Connecting to Wirepine Speaks…';try{await ensureConnection();sendQueuedTurn();return;}catch(e2){e=e2;}}liveError(e);}}
+async function requestFortune(event){event.preventDefault();if(phase==='dormant'){awaken();return;}if(phase!=='idle')return;const q=question.value.trim();if(!q){sign.textContent='First, ask your question';status.textContent='Type a question above, or choose one of the suggestions.';question.focus();return;}clearTimeout(idleTimer);sessionWanted=true;if(matchMedia('(max-width:760px)').matches){question.blur();setTimeout(()=>$('.window').scrollIntoView({behavior:'smooth',block:'center'}),150);}turn={question:q,text:'',source:null,sent:false};state('connecting');sign.textContent='Opening the line';status.textContent='Connecting to Wirepine Speaks…';try{await unlockAudio();await ensureConnection();sendQueuedTurn();}catch(e){if(skipTried&&!TEXT_MODE){greetingSkipOk=false;skipTried=false;turn={question:q,text:'',source:null,sent:false};state('connecting');sign.textContent='Opening the line';status.textContent='Connecting to Wirepine Speaks…';try{await ensureConnection();sendQueuedTurn();return;}catch(e2){e=e2;}}liveError(e);}}
 $('#ask').addEventListener('click',requestFortune);$('#question-form').addEventListener('submit',requestFortune);
 // Render the completed response as a fortune card after audio/response completion.
 async function reveal(){if(!turn||turn.revealing||!turn.text)return;turn.revealing=true;clearTimeout(turnWatchdog);clearTimeout(restoreTimer);state('printing');sign.textContent='Take your fortune';status.textContent='Your fortune is coming through…';tone(160,.2);current={...turn};current.source??=relatedReading(current.text,current.question);turn=null;$('#fortune-text').textContent=current.text;$('#card-question').textContent='“'+current.question+'”';if(current.source){$('#source').href=current.source.url;$('#source-title').textContent=current.source.title;$('#source').querySelector('small').textContent=current.source.kind==='related'?'RELATED TECHTALES READING':'ARTICLE REFERENCED IN THIS FORTUNE';$('#source').hidden=false;}else{$('#source').hidden=true;}$('#card-note').textContent=current.source?.kind==='related'?'Live fortune. The linked article is suggested related reading, not a verified retrieval citation.':'An AI fortune inspired by the TechTales archive.';await wait(1600);if(!$('#fortune-dialog').open)$('#fortune-dialog').showModal();clearTimeout(idleTimer);transport?.close();setConnectedLabel(false);}
