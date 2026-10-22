@@ -873,6 +873,16 @@ $('#end-session').addEventListener('click',sleep);
 $('#how').addEventListener('click',()=>$('#about').showModal());for(const id of ['close-about','back'])$('#'+id).addEventListener('click',()=>$('#about').close());for(const d of document.querySelectorAll('dialog'))d.addEventListener('click',e=>{if(e.target===d){if(d.id==='fortune-dialog')reset();else d.close();}});
 // Pumpkin egg toggle: never remembered, so every page load starts with the original face.
 $('#egg').addEventListener('click',()=>{const egg=$('#egg'),on=egg.getAttribute('aria-pressed')!=='true';egg.setAttribute('aria-pressed',String(on));$('#egg-label').textContent=on?'back to Andrew':'pumpkin egg';$('#world').classList.toggle('pumpkin',on);oracle.setFaces(on);});
+// Auto-sleep: after 90s with no interaction the machine returns to its closed state (same routine as End session).
+// It never sleeps mid-action: while thinking/speaking/printing, with a card or dialog open, and typed text gets double the time.
+let AUTO_SLEEP_MS=90000,lastActivity=Date.now();
+for(const t of ['pointerdown','keydown','wheel','touchstart','scroll'])addEventListener(t,()=>{lastActivity=Date.now();},{passive:true,capture:true});
+setInterval(()=>{
+ if(!machine.classList.contains('awake')||phase!=='idle'||$('#fortune-dialog').open||$('#about').open){lastActivity=Date.now();return;}
+ if(Date.now()-lastActivity<AUTO_SLEEP_MS*(question.value.trim()?2:1))return;
+ sleep();lastActivity=Date.now();
+ const egg=$('#egg');if(egg.getAttribute('aria-pressed')==='true')egg.click();
+},2000);
 window.addEventListener('pagehide',()=>{disconnect();if(audio)audio.close();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(idleTimer);idleTimer=setTimeout(()=>disconnect('The machine rested while you were away. Ask again to reconnect.'),30000);}else if(transport?.ready&&!turn){clearTimeout(idleTimer);idleTimer=setTimeout(()=>disconnect(),60000);}});
 
